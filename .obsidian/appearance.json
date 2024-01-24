@@ -3,5 +3,8 @@
   "monospaceFontFamily": "FiraCode Nerd Font",
   "baseFontSize": 16,
   "nativeMenus": false,
-  "translucency": false
+  "translucency": false,
+  "enabledCssSnippets": [
+    "side_note"
+  ]
 }
