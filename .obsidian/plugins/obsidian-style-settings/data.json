@@ -1,0 +1,7 @@
+{
+  "sidenote-callout@@top-sidenote-callout-title": true,
+  "sidenote-callout@@top-left-sidenote-callout-title-position": "l-left-callout-title",
+  "sidenote-callout@@top-right-sidenote-callout-title-position": "r-left-callout-title",
+  "sidenote-callout@@sidenote-backgound": false,
+  "sidenote-callout@@hide-sidenote-callout-fold-icon": false
+}
