@@ -4,5 +4,6 @@
   "strictLineBreaks": true,
   "showLineNumber": true,
   "tabSize": 2,
-  "livePreview": false
+  "livePreview": false,
+  "defaultViewMode": "preview"
 }
