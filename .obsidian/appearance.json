@@ -6,5 +6,6 @@
   "translucency": false,
   "enabledCssSnippets": [
     "side_note"
-  ]
+  ],
+  "theme": "obsidian"
 }
