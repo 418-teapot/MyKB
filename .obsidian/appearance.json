@@ -7,5 +7,6 @@
   "enabledCssSnippets": [
     "side_note"
   ],
-  "theme": "obsidian"
+  "theme": "obsidian",
+  "interfaceFontFamily": "Noto Sans CJK SC"
 }
