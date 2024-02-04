@@ -203,7 +203,7 @@
   "SelectedTheme": {
     "settings": {
       "codeblock": {
-        "enableLineNumbers": true,
+        "enableLineNumbers": false,
         "enableActiveLineHighlight": true,
         "enableDeleteCodeButton": false,
         "codeBlockBorderStylingPosition": "disable",
