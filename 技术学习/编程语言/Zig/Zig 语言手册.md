@@ -117,3 +117,45 @@ const S = struct {
   //! the package documentation, these comments are ignored.
 };
 ```
+
+# 值
+
+## 内建类型
+
+| 类型             | 等价的 C 类型         | 描述                                                                   |
+| ---------------- | --------------------- | ---------------------------------------------------------------------- |
+| `i8`             | `int8_t`              | 8-bit 有符号整型                                                       |
+| `u8`             | `uint8_t`             | 8-bit 无符号整型                                                       |
+| `i16`            | `int16_t`             | 16-bit 有符号整型                                                      |
+| `u16`            | `uint16_t`            | 16-bit 无符号整型                                                      |
+| `i32`            | `int32_t`             | 32-bit 有符号整型                                                      |
+| `u32`            | `uint32_t`            | 32-bit 无符号整型                                                      |
+| `i64`            | `int64_t`             | 64-bit 有符号整型                                                      |
+| `u64`            | `uint64_t`            | 64-bit 无符号整型                                                      |
+| `i128`           | `__int128`            | 128-bit 有符号整型                                                     |
+| `u128`           | `unsigned __int128`   | 128-bit 无符号整型                                                     |
+| `isize`          | `intptr_t`            | 有符号指针大小类型                                                     |
+| `usize`          | `uintptr_t`, `size_t` | 无符号指针大小整型                                                     |
+| `c_char`         | `char`                | C ABI 兼容类型                                                         |
+| `c_short`        | `short`               | C ABI 兼容类型                                                         |
+| `c_ushort`       | `unsigned short`      | C ABI 兼容类型                                                         |
+| `c_int`          | `int`                 | C ABI 兼容类型                                                         |
+| `c_uint`         | `unsigned int`        | C ABI 兼容类型                                                         |
+| `c_long`         | `long`                | C ABI 兼容类型                                                         |
+| `c_ulong`        | `unsigned long`       | C ABI 兼容类型                                                         |
+| `c_longlong`     | `long long`           | C ABI 兼容类型                                                         |
+| `c_ulonglong`    | `unsigned long long`  | C ABI 兼容类型                                                         |
+| `c_longdouble`   | `long double`         | C ABI 兼容类型                                                         |
+| `f16`            | `_Float16`            | 16-bit 浮点数（10-bit 尾数）IEEE-754-2008 binary16                     |
+| `f32`            | `float`               | 32-bit 浮点数（23-bit 尾数）IEEE-754-2008 binary32                     |
+| `f64`            | `double`              | 64-bit 浮点数（52-bit 尾数）IEEE-754-2008 binary64                     |
+| `f80`            | `double`              | 80-bit 浮点数（64-bit 尾数）IEEE-754-2008 80-bit extended precision    |
+| `f128`           | `_Float128`           | 128-bit 浮点数（112-bit 尾数）IEEE-754-2008 binary128                  |
+| `bool`           | `bool`                | `true` 或者 `false`                                                    |
+| `anyopaque`      | `void`                | 用于类型擦除指针                                                       |
+| `void`           |                       | 总为 `void{}`                                                          |
+| `noreturn`       |                       | `break`, `continue`, `return`, `unreachable`, `while (true) {}` 的类型 |
+| `type`           |                       | 类型的类型                                                             |
+| `anyerror`       |                       | 错误代码                                                               |
+| `comptime_int`   |                       | 编译期已知的整型字面量                                                 |
+| `comptime_float` |                       | 编译期已知的浮点型字面量                                               |
