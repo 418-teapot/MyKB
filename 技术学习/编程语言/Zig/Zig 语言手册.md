@@ -146,11 +146,11 @@ const S = struct {
 | `c_longlong`     | `long long`           | C ABI 兼容类型                                                         |
 | `c_ulonglong`    | `unsigned long long`  | C ABI 兼容类型                                                         |
 | `c_longdouble`   | `long double`         | C ABI 兼容类型                                                         |
-| `f16`            | `_Float16`            | 16-bit 浮点数（10-bit 尾数）IEEE-754-2008 binary16                     |
-| `f32`            | `float`               | 32-bit 浮点数（23-bit 尾数）IEEE-754-2008 binary32                     |
-| `f64`            | `double`              | 64-bit 浮点数（52-bit 尾数）IEEE-754-2008 binary64                     |
-| `f80`            | `double`              | 80-bit 浮点数（64-bit 尾数）IEEE-754-2008 80-bit extended precision    |
-| `f128`           | `_Float128`           | 128-bit 浮点数（112-bit 尾数）IEEE-754-2008 binary128                  |
+| `f16`            | `_Float16`            | 16-bit 浮点型（10-bit 尾数）IEEE-754-2008 binary16                     |
+| `f32`            | `float`               | 32-bit 浮点型（23-bit 尾数）IEEE-754-2008 binary32                     |
+| `f64`            | `double`              | 64-bit 浮点型（52-bit 尾数）IEEE-754-2008 binary64                     |
+| `f80`            | `double`              | 80-bit 浮点型（64-bit 尾数）IEEE-754-2008 80-bit extended precision    |
+| `f128`           | `_Float128`           | 128-bit 浮点型（112-bit 尾数）IEEE-754-2008 binary128                  |
 | `bool`           | `bool`                | `true` 或者 `false`                                                    |
 | `anyopaque`      | `void`                | 用于类型擦除指针                                                       |
 | `void`           |                       | 总为 `void{}`                                                          |
@@ -159,3 +159,5 @@ const S = struct {
 | `anyerror`       |                       | 错误代码                                                               |
 | `comptime_int`   |                       | 编译期已知的整型字面量                                                 |
 | `comptime_float` |                       | 编译期已知的浮点型字面量                                               |
+
+除了上面的整型之外，还可以在 `i` 或 `u` 标识符后跟数字来使用任意位宽的整型，例如 `i7` 表示 7-bit 有符号整型。
