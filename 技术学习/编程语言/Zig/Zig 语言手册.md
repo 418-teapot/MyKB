@@ -207,3 +207,81 @@ const hello_world_in_c =
   \\}
 ;
 ```
+
+## 赋值
+
+使用 `=` 将一个值赋给一个标志符。
+
+可以用 `const` 关键字来修饰该标志符不可变，这仅适用于该标志符能够立即寻址到的所有字节。
+
+```zig file:constant_identifier_cannot_change.zig
+const x = 1234;
+
+fn foo() void {
+  // It works at file scope as well as inside functions.
+  const y = 5678;
+
+  // Once assigned, an identifier cannot be changed.
+  y += 1;
+}
+
+pub fn main() void {
+  foo();
+}
+```
+
+```bash title:Shell
+$ zig build-exe constant_identifier_cannot_change.zig
+constant_identifier_cannot_change.zig:8:7: error: cannot assign to constant
+    y += 1;
+    ~~^~~~
+```
+
+对于能够修改值的变量，需要用 `var` 关键字修饰：
+
+```zig file:mutable_var.zig
+const print = @import("std").debug.print;
+
+pub fn main() void {
+  var y: i32 = 5678;
+  y += 1;
+  print("{d}", .{y});
+}
+```
+
+```bash title:Shell
+$ zig build-exe mutable_var.zig
+$ ./mutable_var
+5679
+```
+
+变量必须被初始化：
+
+```zig title:var_must_be_initialized.zig
+pub fn main() void {
+  var x: i32;
+  x = 1;
+}
+```
+
+```bash title:Shell
+$ zig build-exe var_must_be_initialized.zig
+var_must_be_initialized.zig:2:5: error: variables must be initialized
+    var x: i32;
+    ^~~~~~~~~~
+```
+
+### undefined
+
+可以使用 `undefined` 关键字使变量保持未初始化状态：
+
+```zig file:assign_undefined.zig
+pub fn main() void {
+  var x: i32 = undefined;
+  x = 1;
+}
+```
+
+`undefined` 可以被强制转为任何类型，一旦发生转换，就不再能检测到该值是否为 `undefined` 了。
+
+在 Debug 模式下，Zig 会将 `0xaa` 写入到未定义的内存，该行为仅供调试使用，并非语言语义。
