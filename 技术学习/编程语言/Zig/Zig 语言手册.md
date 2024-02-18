@@ -169,3 +169,41 @@ const S = struct {
 | `true` or `false` | `bool` 值              |
 | `null`            | 用于设置 optional 类型 | 
 | `undefined`       | 用于未指定值的变量     |
+
+## 字符串字面量与 Unicode 字面量
+
+字符串字面量是指向以 `null` 为终止符的字节数组的常指针，可以被强制转为切片和 Null 终止指针。对字符串字面量解引用会将其转为数组。
+
+由于 Zig 采用 UTF-8 编码，因此字符串字面量中的任何字节都会按照 UTF-8 含义进行编解码，编译器不会修改任何字节。如果要嵌入非 UTF-8 字节，可以使用 `\xNN` 表示法。
+
+Unicode 字面量都拥有 `comptime_int` 类型，与整型字面量一致。所有转译序列在字符串字面量和 Unicode 字面量中均有效。
+
+### 转义序列
+
+| 转义序列     | 名称               |
+| ------------ | ------------------ |
+| `\n`         | Newline            |
+| `\r`         | Carriage Return    |
+| `\t`         | Tab                |
+| `\\`         | Backslash          |
+| `\'`         | 单引号             |
+| `\"`         | 双引号             | 
+| `\xNN`       | 16 进制字节值      |
+| `\u{NNNNNN}` | 16 进制 Unicode 值 |
+
+需要注意的是 Unicode 值最大为 `\0x10ffff`。
+
+### 多行字符串
+
+多行字符串没有转义序列并且可以跨越多行。多行字符串在每一行都需要以 `\\` 开头，除了最后一行外，每一行的行尾换行符也会被包含在字符串字面量中。
+
+```zig file:multiline_string_literals.zig
+const hello_world_in_c =
+  \\#include <stdio.h>
+  \\
+  \\int main(int argc, char **argv) {
+  \\  printf("hello world\n");
+  \\  return 0;
+  \\}
+;
+```
