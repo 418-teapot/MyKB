@@ -5,5 +5,7 @@
   "showLineNumber": true,
   "tabSize": 2,
   "livePreview": false,
-  "defaultViewMode": "preview"
+  "defaultViewMode": "preview",
+  "attachmentFolderPath": "./Img",
+  "newLinkFormat": "absolute"
 }
