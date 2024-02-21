@@ -25,10 +25,10 @@
         }
     }
     \node (start) {};
-    \node [procedure, right = of start] (cpp) {预处理器\\(cpp)};
-    \node [procedure, right = of cpp] (cc1) {编译器\\(cc1)};
-    \node [procedure, right = of cc1] (as) {汇编器\\(as)};
-    \node [procedure, right = of as] (ld) {链接器\\(ld)};
+    \node [procedure, right = of start] (cpp) {预处理器\\(\texttt{cpp})};
+    \node [procedure, right = of cpp] (cc1) {编译器\\(\texttt{cc1})};
+    \node [procedure, right = of cc1] (as) {汇编器\\(\texttt{as})};
+    \node [procedure, right = of as] (ld) {链接器\\(\texttt{ld})};
     \node [above right = 0.5em of as] (print) {\texttt{printf.o}};
     \node [right = of ld] (end) {};
     \graph {
