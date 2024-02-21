@@ -1,0 +1,44 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{ctex}
+
+\usetikzlibrary{
+    arrows,
+    arrows.meta,
+    calc,
+    graphs,
+    positioning,
+    quotes,
+}
+
+\begin{document}
+
+\begin{tikzpicture}[node distance = 5em]
+    \tikzset{
+        procedure/.style = {
+            draw,
+            rounded corners = 1mm,
+            inner sep = 0.2em,
+            minimum height = 4.5em,
+            text width = 6em,
+            text centered,
+        }
+    }
+    \node (start) {};
+    \node [procedure, right = of start] (cpp) {预处理器\\(cpp)};
+    \node [procedure, right = of cpp] (cc1) {编译器\\(cc1)};
+    \node [procedure, right = of cc1] (as) {汇编器\\(as)};
+    \node [procedure, right = of as] (ld) {链接器\\(ld)};
+    \node [above right = 0.5em of as] (print) {\texttt{printf.o}};
+    \node [right = of ld] (end) {};
+    \graph {
+        (start) -> [align = center, "\texttt{hello.c}"above, "源文件"below] (cpp) ->
+                   [align = center, "\texttt{hello.i}"above, "修改后的\\源文件"below] (cc1) ->
+                   [align = center, "\texttt{hello.s}"above, "汇编文件"below] (as) ->
+                   [align = center, "\texttt{hello.o}"above, "可重定位\\目标程序"below] (ld) ->
+                   [align = center, "\texttt{hello}"above, "可执行\\目标程序"below] (end);
+    };
+    \draw (print) [->] |- ($(ld.west)!1/2!(ld.north west)$);
+\end{tikzpicture}
+
+\end{document}
