@@ -7,6 +7,8 @@
 - 可重用：相同的代码可以在具有不同限制的环境中运行；
 - 可维护：可以精确得向编译器和其他程序员传达意图。
 
+---
+
 # Hello World
 
 ```zig file:hello.zig
@@ -45,6 +47,8 @@ Hello, world!
 ```
 
 这种情况下，返回值的 `!` 可以被省略，因为该函数不会返回异常。
+
+---
 
 # 注释
 
@@ -117,6 +121,8 @@ const S = struct {
   //! the package documentation, these comments are ignored.
 };
 ```
+
+---
 
 # 值
 
@@ -285,3 +291,40 @@ pub fn main() void {
 `undefined` 可以被强制转为任何类型，一旦发生转换，就不再能检测到该值是否为 `undefined` 了。
 
 在 Debug 模式下，Zig 会将 `0xaa` 写入到未定义的内存，该行为仅供调试使用，并非语言语义。
+
+---
+
+# Zig 测试
+
+在 `test` 声明中的代码可以确保行为满足预期：
+
+```zig file:testing_introduction.zig
+const std = @import("std");
+
+test "expect addOne adds one to 41" {
+  // The Standard Library contains useful functions to help create tests.
+  // `expect` is a function that verifies its argument is true. It will
+  // return an error if its argument is false to indicate a failure.
+  // `try` is used to return an error to the test runner to notify it
+  // that the test failed.
+  try std.testing.expect(addOne(41) == 42);
+}
+
+test addOne {
+  // A test name can also be written using an identifier.
+  try std.testing.expect(addOne(41) == 42);
+}
+
+fn addOne(number: i32)  i32 {
+  return number + 1;
+}
+```
+
+`zig test` 是一个创建并运行测试构建的工具。默认情况下，它使用 Zig 标准库提供的 *default test runner* 作为 `main` 入口点来构建并运行可执行程序。*default test runner* 会将测试结果打印到标准错误流：
+
+```bash title:Shell
+$ zig test testing_introduction.zig
+1/2 test.expect addOne adds one to 41... OK
+2/2 decltest.addOne... OK
+All 2 tests passed.
+```
