@@ -342,3 +342,29 @@ Zig 测试使用 `test` 关键字进行声明，后跟可选的字符串字面�
 ### 文档测试
 
 使用标志符命名的测试声明是文档测试。该标志符必须要引用相同作用域里的另一个声明。文档测试与文档注释一样，是作为关联的声明的文档，并且会出现在生成的文档中。
+
+## 测试失败
+
+当测试返回 error 时，该测试被视为失败，错误报告会输出到标准错误流。
+
+```zig file:testing_failure.zig
+const std = @import("std");
+
+test "expect this to fail" {
+  try std.testing.expect(false);
+}
+
+test "expect this to succeed" {
+  try std.testing.expect(true);
+}
+```
+
+```bash title:Shell
+$ zig test testing_failure.zig
+1/2 test.expect this to fail... FAIL (TestUnexpectedResult)
+...
+    try std.testing.expect(false);
+    ^
+2/2 test.expect this to succeed... OK
+1 passed; 0 skipped; 1 failed.
+```
