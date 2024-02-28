@@ -368,3 +368,21 @@ $ zig test testing_failure.zig
 2/2 test.expect this to succeed... OK
 1 passed; 0 skipped; 1 failed.
 ```
+
+## 跳过测试
+
+跳过测试的一种方法是使用 `zig test --test-filter [text]` 命令，这只会构建指定名称的测试，需要注意的是，这不会过滤掉未命名的测试。
+
+当一个 `test` 返回 `error.SkipZigTest` 错误时，*default test runner* 会跳过该测试，所有测试运行结束后，会报告跳过的测试总数。
+
+```zig file:testing_skip.zig
+test "this will be skipped" {
+  return error.SkipZigTest;
+}
+```
+
+```bash title:Shell
+$ zig test testing_skip.zig
+1/1 test.this will be skipped... SKIP
+0 passed; 1 skipped; 0 failed.
+```
