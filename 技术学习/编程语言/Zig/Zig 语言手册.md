@@ -386,3 +386,29 @@ $ zig test testing_skip.zig
 1/1 test.this will be skipped... SKIP
 0 passed; 1 skipped; 0 failed.
 ```
+
+## 报告内存泄漏
+
+当代码使用 Zig 标准库提供的 `std.testing.allocator` 申请内存时，*default test runner* 会报告其发现的内存泄漏。
+
+```zig file:testing_detect_leak.zig
+const std = @import("std");
+
+test "detect leak" {
+  var list = std.ArrayList(u21).init(std.testing.allocator);
+  // missing `defer list.deinit();`
+  try list.append('☔');
+
+  try std.testing.expect(list.items.len == 1);
+}
+```
+
+```bash title:Shell
+$ zig test testing_detect_leak.zig
+1/1 test.detect leak... OK
+[gpa] (err): memory address 0x7f736a84a000 leaked:
+...
+All 1 tests passed.
+1 errors were logged.
+1 tests leaked memory.
+```
