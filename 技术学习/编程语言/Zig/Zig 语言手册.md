@@ -436,3 +436,7 @@ $ zig test testing_detect_test.zig
 1/1 test.builtin.is_test... OK
 All 1 tests passed.
 ```
+
+## 测试输出与日志
+
+*default test runner* 和 Zig 标准库的测试命名空间会将消息输出到标准错误流。
