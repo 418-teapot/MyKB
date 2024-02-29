@@ -412,3 +412,27 @@ All 1 tests passed.
 1 errors were logged.
 1 tests leaked memory.
 ```
+
+## 检测测试构建
+
+可以使用编译期变量 `@import("builtin").is_test` 来检测是否为测试。
+
+```zig file:testing_detect_test.zig
+const std = @import("std");
+const builtin = @import("builtin");
+const expect = std.testing.expect;
+
+test "builtin.is_test" {
+  try expect(isATest());
+}
+
+fn isATest() bool {
+  return builtin.is_test;
+}
+```
+
+```bash title:Shell
+$ zig test testing_detect_test.zig
+1/1 test.builtin.is_test... OK
+All 1 tests passed.
+```
