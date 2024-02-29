@@ -439,4 +439,38 @@ All 1 tests passed.
 
 ## 测试输出与日志
 
-*default test runner* 和 Zig 标准库的测试命名空间会将消息输出到标准错误流。
+*default test runner* 和 Zig 标准库的 `testing` 命名空间会将消息输出到标准错误流。
+
+## `testing` 命名空间
+
+Zig 标准库的 `testing` 命名空间中包含许多有用的函数，例如：
+
+```zig file:testing_namespace.zig
+const std = @import("std");
+
+test "expectEqual demo" {
+  const expected: i32 = 42;
+  const actual = 42;
+
+  // The first argument to `expectEqual` is the known, expected, result.
+  // The second argument is the result of some expression.
+  // The actual's type is casted to the type of expected.
+  try std.testing.expectEqual(expected, actaul);
+}
+
+test "expectError demo" {
+  const expected_error = error.DemoError;
+  const actual_error_union: anyerror!void = error.DemoError;
+
+  // `expectError` will fail when the actual error is different than
+  // the expected error.
+  try.std.testing.expectError(expected_error, actual_error_union);
+}
+```
+
+```bash title:Shell
+$ zig test testing_namespace.zig
+1/2 test.expectEqual demo... OK
+2/2 test.expectError demo... OK
+All 2 tests passed.
+```
