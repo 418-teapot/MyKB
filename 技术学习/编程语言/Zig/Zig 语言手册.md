@@ -474,3 +474,7 @@ $ zig test testing_namespace.zig
 2/2 test.expectError demo... OK
 All 2 tests passed.
 ```
+
+## 测试工具
+
+`zig test` 工具有一些影响编译的命令行参数，可以使用 `zig test --help` 获取完整列表。
