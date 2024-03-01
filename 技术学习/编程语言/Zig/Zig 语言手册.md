@@ -511,3 +511,42 @@ const Color = enum {
 };
 const color: Color = .@"really red";
 ```
+
+## 容器级变量
+
+Zig 中的容器是指任何可以充当命名空间的语法结构，用于保存变量和函数声明。容器也是可以被实例化的类型定义。`struct`、`enum`、`union`、`opaque`，甚至 Zig 源文件本身都是容器。
+
+尽管容器（Zig 源文件除外）使用大括号来包围其定义，但不应该将它们与块或函数混淆，容器不能包含任何语句。
+
+容器级变量就是定义在容器中的变量。容器级变量具有：
+
+- 静态生命周期（static lifetime）：生命周期与容器相同，被所有容器的实例共享。
+- 顺序独立性（order-independent）：声明顺序对其行为没有影响。无论它们在容器内部的声明顺序如何，都不会影响它们的初始化或访问顺序。
+- 惰性分析（lazily analyzed）：编译器只有在变量被实际使用时才会对其进行分析，而不会提前分析所有变量。
+
+容器级变量的初始化值在声明时会被隐式地标记为 `comptime`。如果容器级变量被 `const` 修饰，那么该值为编译时已知的，否则就为运行时已知的。
+
+```zig file:test_namespaced_container_level_varibal.zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+test "namespaced container level variable" {
+  try expect(foo() == 1235);
+  try expect(foo() == 1236);
+}
+
+const S = struct {
+  var x: i32 = 1234;
+};
+
+fn foo() i32 {
+  S.x += 1;
+  return S.x;
+}
+```
+
+```bash title:Shell
+$ zig test test_namespaced_container_level_variable.zig
+1/1 test.namespaced container level variable... OK
+All 1 tests passed.
+```
