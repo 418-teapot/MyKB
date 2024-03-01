@@ -550,3 +550,31 @@ $ zig test test_namespaced_container_level_variable.zig
 1/1 test.namespaced container level variable... OK
 All 1 tests passed.
 ```
+
+## 静态局部变量
+
+通过在函数内部使用容器级变量，还可以使局部变量具有静态声明周期：
+
+```zig file:test_static_local_variable.zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+test "static local variable" {
+  try expect(foo() == 1235);
+  try expect(foo() == 1236);
+}
+
+fn foo() i32 {
+  const S = struct {
+    var x: i32 = 1234;
+  };
+  S.x += 1;
+  return S.x;
+}
+```
+
+```bash title:Shell
+$ zig test test_static_local_variable.zig
+1/1 test.static local variable... OK
+All 1 tests passed.
+```
