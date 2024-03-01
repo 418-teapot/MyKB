@@ -488,3 +488,26 @@ All 2 tests passed.
 声明变量时通常最好使用 `const` 而不是 `var`，这可以减少人类和计算机的心智负担，并创造更多的优化机会。
 
 `extern` 关键字和 `@extern` 内建函数可用于链接从别的目标文件中导出的变量，`export` 关键字和 `@export` 内建函数可以将变量在链接时导出供其他目标文件使用。在这两种情况下，变量的类型必须与 C ABI 兼容。
+
+## 标志符
+
+变量标志符不允许遮蔽（shadow）外部作用域的标志符。
+
+标志符必须以字母或下划线开头，后面可以跟任意数量的字母数字或下划线。不得与关键字重名。
+
+如果需要的名称不符合这些要求（例如与外部库链接），则需要使用 `@""` 语法。
+
+```zig file:identifiers.zig
+const @"identifier with space in it" = 0xff;
+const @"1SmallStep4Man" = 112358;
+
+const c = @import("std").c;
+pub extern "c" fn @"error"() void;
+pub extern "c" fn @"fstat$INODE64"(fd: c.fd_t, buf: *c.Stat) c_int;
+
+const Color = enum {
+  red,
+  @"really red",
+};
+const color: Color = .@"really red";
+```
