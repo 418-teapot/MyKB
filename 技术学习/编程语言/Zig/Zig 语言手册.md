@@ -611,3 +611,40 @@ All 1 tests passed.
 ```
 
 对于单线程的构建来说，所有线程局部变量都会被视为常规的容器极变量。
+
+## 局部变量
+
+局部变量出现在函数、`comptime` 块和 `@cImport` 块中。
+
+当局部变量被 `const` 关键字修饰时，说明该变量的值在初始化后不会发生任何改变。如果 `const` 变量的初始化值是编译期已知的，那么该变量也是编译期已知的。
+
+局部变量可以被 `comptime` 关键字修饰。这说明该变量的值是编译期已知的，并且该变量的所有读写操作都在程序的语义分析期间发生，而不是在运行时发生。在 `comptime` 表达式中声明的所有变量都是隐式的 `comptime` 变量。
+
+```zig file:test_comptime_variables.zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+test "comptime vars" {
+  var x: i32 = 1;
+  comptime var y: i32 = 1;
+
+  x += 1;
+  y += 1;
+
+  try expect(x == 2);
+  try expect(y == 2);
+
+  if (y != 2) {
+    // This compile error never triggers because y is a comptime
+    // variable, and so `y != 2` is a comptime value, and this if is
+    // statically evaluated.
+    @compileError("wrong y value");
+  }
+}
+```
+
+```bash title:Shell
+$ zig test test_comptime_variables.zig
+1/1 test_comptime_variables.test.comptime vars... OK
+All 1 tests passed.
+```
