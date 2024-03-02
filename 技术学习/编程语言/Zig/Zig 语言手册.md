@@ -578,3 +578,36 @@ $ zig test test_static_local_variable.zig
 1/1 test.static local variable... OK
 All 1 tests passed.
 ```
+
+## 线程局部变量
+
+可以使用 `threadlocal` 关键字将变量指定为线程局部变量，使得每个线程都可以使用该变量的单独实例：
+
+```zig file:test_thread_local_variables.zig
+const std = @import("std");
+const assert = std.debug.assert;
+
+threadlocal var x: i32 = 1234;
+
+test "thread local storage" {
+  const thread1 = try std.Thread.spawn(.{}, testTls, .{});
+  const thread2 = try std.Thread.spawn(.{}, testTls, .{});
+  testTls();
+  thread1.join();
+  thread2.join();
+}
+
+fn testTls() void {
+  assert(x == 1234);
+  x += 1;
+  assert(x == 1235);
+}
+```
+
+```bash title:Shell
+$ zig test test_thread_local_variables.zig
+1/1 test_thread_local_variables.test.thread local storage... OK
+All 1 tests passed.
+```
+
+对于单线程的构建来说，所有线程局部变量都会被视为常规的容器极变量。
