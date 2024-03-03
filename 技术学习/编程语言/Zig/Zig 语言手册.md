@@ -784,22 +784,22 @@ $$
   & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{a +\% b} & \text{· 整型} & \text{Wrapping Addition} & \texttt{@as(u32, std.math.maxInt(u32)) +\% 1 == 0} \\
-  \texttt{a +\% = b} & & \text{· 保证具有二进制补码回绕行为} & \\
+  \texttt{a +\%= b} & & \text{· 保证具有二进制补码回绕行为} & \\
   & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{a +| b} & \text{· 整型} & \text{Saturating Addition} & \texttt{@as(u32, std.math.maxInt(u32)) +| 1 ==} \\
-  \texttt{a +| = b} & & \text{· 调用操作数的 Peer Type Resolution} & \texttt{@as(u32, std.math.maxInt(u32))} \\
+  \texttt{a +|= b} & & \text{· 调用操作数的 Peer Type Resolution} & \texttt{@as(u32, std.math.maxInt(u32))} \\
   \hline
   \texttt{a - b} & \text{· 整型} & \text{Subtraction} & \texttt{2 - 5 == -3} \\
   \texttt{a -= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
   & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{a -\% b} & \text{· 整型} & \text{Wrapping Subration} & \texttt{@as(u32, 0) -\% 1 == std.math.maxInt(u32)} \\
-  \texttt{a -\% = b} & & \text{· 保证具有二进制补码回绕行为} & \\
+  \texttt{a -\%= b} & & \text{· 保证具有二进制补码回绕行为} & \\
   & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{a -| b} & \text{· 整型} & \text{Saturating Subration} & \texttt{@as(u32, 0) -| 1 == 0} \\
-  \texttt{a -| = b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \texttt{a -|= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{-a} & \text{· 整型} & \text{Negation} & \texttt{-1 == 0 - 1} \\
   & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
@@ -812,11 +812,11 @@ $$
   & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{a *\% b} & \text{· 整型} & \text{Wrapping Multiplication} & \texttt{@as(u8, 200) *\% 2 == 144} \\
-  \texttt{a *\% = b} & & \text{· 保证具有二进制补码回绕行为} & \\
+  \texttt{a *\%= b} & & \text{· 保证具有二进制补码回绕行为} & \\
   & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{a *| b} & \text{· 整型} & \text{Saturating Multiplication} & \texttt{@as(u8, 200) *| 2 == 255} \\
-  \texttt{a +| = b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \texttt{a *|= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{a / b} & \text{· 整型} & \text{Division} & \texttt{10 / 5 == 2} \\
   \texttt{a /= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
