@@ -853,5 +853,25 @@ $$
   \texttt{a \^{}\,= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
   \hline
   \texttt{\~{} b} & \text{· 整型} & \text{Bitwise NOT} & \texttt{\~{}\,@as(u8, 0b10101111) == 0b01010000} \\
+  \hline
+  \texttt{a orelse b} & \text{Optionals} & \text{当 \texttt{a} 为 \texttt{null} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: ?u32 = null;} \\
+  & & \text{\texttt{b} 的类型也有可能是 \texttt{noreturn} 类型} & \texttt{const unwrapped = value orelse 1234;} \\
+  & & & \texttt{unwrapped == 1234;} \\
+  \hline
+  \texttt{a.?} & \text{Optionals} & \text{等价于 \texttt{a orelse unreachable}} & \texttt{const value: ?u32 = 5678;} \\
+  & & & \texttt{value.? == 5678} \\
+  \hline
+  \texttt{a catch b} & \text{Error Unions} & \text{当 \texttt{a} 为 \texttt{error} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: anyerror!u32 = error.Broken;} \\
+  \texttt{a catch |err| b} & & \text{\texttt{b} 的类型也有可能是 \texttt{noreturn} 类型} & \texttt{const unwrapped = value catch 1234;} \\
+  & & \text{\texttt{err} 是一个定义在表达式 \texttt{b} 作用域的 \texttt{error}} & \texttt{unwrapped == 1234} \\
+  \hline
+  \texttt{a and b} & \text{bool} & \text{如果 \texttt{a} 为 \texttt{false}，直接返回 \texttt{false}} & \texttt{(false and true) == false} \\
+  & & \text{否则返回 \texttt{b}} & \\
+  \hline
+  \texttt{a or b} & \text{bool} & \text{如果 \texttt{a} 为 \texttt{true}，直接返回 \texttt{true}} & \texttt{(false or true) == true} \\
+  & & \text{否则返回 \texttt{b}} & \\
+  \hline
+  \texttt{!a} & \text{bool} & \text{布尔 NOT} & \texttt{!false == true} \\
+  \hline
 \end{array}
 $$
