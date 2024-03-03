@@ -683,7 +683,7 @@ fn divide(a: i32, b: i32) i32 {
 
 在这个函数中，变量 `a` 和 `b` 只有在运行时才已知，因此该除法操作对于*整型溢出*和*除零*是脆弱的。
 
-`+` 和 `-` 等运算符在*整型溢出*时会发生未定义行为，为了避免未定义行为，Zig 提供了额外的运算符，`+%` 和 `-%` 执行包装（wrapping）运算，`+|` 和 `-|` 执行饱和（saturating）运算。
+`+` 和 `-` 等运算符在*整型溢出*时会发生未定义行为，为了避免未定义行为，Zig 提供了额外的运算符，`+%` 和 `-%` 执行回绕（wrapping）运算，`+|` 和 `-|` 执行饱和（saturating）运算。
 
 Zig 支持任意位宽的整数，通过使用 `i` 或 `u` 标识符后跟数字来使用。对于有符号整数，Zig 使用二进制补码来表示。
 
@@ -765,3 +765,93 @@ $ ./float_mode_exe
 optimized = 9.765625e-04
 strict = 9.765625e-04
 ```
+
+---
+
+# 运算符
+
+Zig 中不存在运算符重载。
+
+## 运算符表
+
+$$
+\begin{array}{llll}
+  \hline
+  语法 & 关联类型 & 描述 & 示例 \\
+  \hline
+  \texttt{a + b} & \text{· 整型} & \text{Addition} & \texttt{2 + 5 == 7} \\
+  \texttt{a += b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a +\% b} & \text{· 整型} & \text{Wrapping Addition} & \texttt{@as(u32, std.math.maxInt(u32)) +\% 1 == 0} \\
+  \texttt{a +\% = b} & & \text{· 保证具有二进制补码回绕行为} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a +| b} & \text{· 整型} & \text{Saturating Addition} & \texttt{@as(u32, std.math.maxInt(u32)) +| 1 ==} \\
+  \texttt{a +| = b} & & \text{· 调用操作数的 Peer Type Resolution} & \texttt{@as(u32, std.math.maxInt(u32))} \\
+  \hline
+  \texttt{a - b} & \text{· 整型} & \text{Subtraction} & \texttt{2 - 5 == -3} \\
+  \texttt{a -= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a -\% b} & \text{· 整型} & \text{Wrapping Subration} & \texttt{@as(u32, 0) -\% 1 == std.math.maxInt(u32)} \\
+  \texttt{a -\% = b} & & \text{· 保证具有二进制补码回绕行为} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a -| b} & \text{· 整型} & \text{Saturating Subration} & \texttt{@as(u32, 0) -| 1 == 0} \\
+  \texttt{a -| = b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{-a} & \text{· 整型} & \text{Negation} & \texttt{-1 == 0 - 1} \\
+  & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
+  \hline
+  \texttt{-\%a} & \text{· 整型} & \text{Wrapping Negation} & \texttt{-\%@as(i32, std.math.minInt(i32)) ==} \\
+  & & \text{· 保证具有二进制补码回绕行为} & \texttt{@as(i32. std.math.minInt(i32))} \\
+  \hline
+  \texttt{a * b} & \text{· 整型} & \text{Multiplication} & \texttt{2 * 5 == 10} \\
+  \texttt{a *= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a *\% b} & \text{· 整型} & \text{Wrapping Multiplication} & \texttt{@as(u8, 200) *\% 2 == 144} \\
+  \texttt{a *\% = b} & & \text{· 保证具有二进制补码回绕行为} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a *| b} & \text{· 整型} & \text{Saturating Multiplication} & \texttt{@as(u8, 200) *| 2 == 255} \\
+  \texttt{a +| = b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a / b} & \text{· 整型} & \text{Division} & \texttt{10 / 5 == 2} \\
+  \texttt{a /= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
+  & & \text{· 在整型下可能发生除 0 异常} & \\
+  & & \text{· 在浮点型的 Optimized 模式下可能发生除 0 异常} & \\
+  & & \text{· 有符号整型必须编译期已知且为正数} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a \% b} & \text{· 整型} & \text{Remainder Division} & \texttt{10 \% 3 == 1} \\
+  \texttt{a \%= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
+  & & \text{· 在整型下可能发生除 0 异常} & \\
+  & & \text{· 在浮点型的 Optimized 模式下可能发生除 0 异常} & \\
+  & & \text{· 有符号整型和浮点型必须编译期已知且为正数} & \\
+  & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a << b} & \text{· 整型} & \text{Bit Shift Left} & \texttt{1 << 8 == 256} \\
+  \texttt{a <<= b} & & \text{· \texttt{b} 必须为编译期已知或与 \texttt{a} 的位宽的 log2 对数具} \\
+  & & \text{有相同的类型} & \\
+  \hline
+  \texttt{a <<| b} & \text{· 整型} & \text{Saturating Bit Shift Left} & \texttt{@as(u8, 1) <<| 8 == 255} \\
+  \texttt{a <<|= b} & & & \\
+  \hline
+  \texttt{a >> b} & \text{· 整型} & \text{Bit Shift Right} & \texttt{10 >> 1 == 5} \\
+  \texttt{a >>= b} & & \text{· \texttt{b} 必须为编译期已知或与 \texttt{a} 的位宽的 log2 对数具} \\
+  & & \text{有相同的类型} & \\
+  \hline
+  \texttt{a \& b} & \text{· 整型} & \text{Bitwise AND} & \texttt{0b011 \& 0b101 == 0b001} \\
+  \texttt{a \&= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a | b} & \text{· 整型} & \text{Bitwise OR} & \texttt{0b010 \& 0b100 == 0b110} \\
+  \texttt{a |= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a \^{} b} & \text{· 整型} & \text{Bitwise XOR} & \texttt{0b011 \^{} 0b101 == 0b110} \\
+  \texttt{a \^{}\,= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{\~{} b} & \text{· 整型} & \text{Bitwise NOT} & \texttt{\~{}\,@as(u8, 0b10101111) == 0b01010000} \\
+\end{array}
+$$
