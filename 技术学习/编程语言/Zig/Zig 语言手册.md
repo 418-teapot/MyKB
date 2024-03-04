@@ -854,24 +854,71 @@ $$
   \hline
   \texttt{\~{} b} & \text{· 整型} & \text{Bitwise NOT} & \texttt{\~{}\,@as(u8, 0b10101111) == 0b01010000} \\
   \hline
-  \texttt{a orelse b} & \text{Optionals} & \text{当 \texttt{a} 为 \texttt{null} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: ?u32 = null;} \\
+  \texttt{a orelse b} & \text{· Optionals} & \text{当 \texttt{a} 为 \texttt{null} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: ?u32 = null;} \\
   & & \text{\texttt{b} 的类型也有可能是 \texttt{noreturn} 类型} & \texttt{const unwrapped = value orelse 1234;} \\
   & & & \texttt{unwrapped == 1234;} \\
   \hline
-  \texttt{a.?} & \text{Optionals} & \text{等价于 \texttt{a orelse unreachable}} & \texttt{const value: ?u32 = 5678;} \\
+  \texttt{a.?} & \text{· Optionals} & \text{等价于 \texttt{a orelse unreachable}} & \texttt{const value: ?u32 = 5678;} \\
   & & & \texttt{value.? == 5678} \\
   \hline
-  \texttt{a catch b} & \text{Error Unions} & \text{当 \texttt{a} 为 \texttt{error} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: anyerror!u32 = error.Broken;} \\
+  \texttt{a catch b} & \text{· Error Unions} & \text{当 \texttt{a} 为 \texttt{error} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: anyerror!u32 = error.Broken;} \\
   \texttt{a catch |err| b} & & \text{\texttt{b} 的类型也有可能是 \texttt{noreturn} 类型} & \texttt{const unwrapped = value catch 1234;} \\
   & & \text{\texttt{err} 是一个定义在表达式 \texttt{b} 作用域的 \texttt{error}} & \texttt{unwrapped == 1234} \\
   \hline
-  \texttt{a and b} & \text{bool} & \text{如果 \texttt{a} 为 \texttt{false}，直接返回 \texttt{false}} & \texttt{(false and true) == false} \\
+  \texttt{a and b} & \text{· bool} & \text{如果 \texttt{a} 为 \texttt{false}，直接返回 \texttt{false}} & \texttt{(false and true) == false} \\
   & & \text{否则返回 \texttt{b}} & \\
   \hline
-  \texttt{a or b} & \text{bool} & \text{如果 \texttt{a} 为 \texttt{true}，直接返回 \texttt{true}} & \texttt{(false or true) == true} \\
+  \texttt{a or b} & \text{· bool} & \text{如果 \texttt{a} 为 \texttt{true}，直接返回 \texttt{true}} & \texttt{(false or true) == true} \\
   & & \text{否则返回 \texttt{b}} & \\
   \hline
-  \texttt{!a} & \text{bool} & \text{布尔 NOT} & \texttt{!false == true} \\
+  \texttt{!a} & \text{· bool} & \text{布尔 NOT} & \texttt{!false == true} \\
+  \hline
+  \texttt{a == b} & \text{· 整型} & \text{· 如果 \texttt{a} 与 \texttt{b} 相等返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(1 == 1) == true} \\
+  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
+  & \text{· bool} & & \\
+  & \text{· type} & & \\
+  \hline
+  \texttt{a == null} & \text{· Optionals} & \text{如果 \texttt{a} 为 \texttt{null} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{const value: ?u32 = null;} \\
+  & & & \texttt{value == null} \\
+  \hline
+  \texttt{a != b} & \text{· 整型} & \text{· 如果 \texttt{a} 与 \texttt{b} 相等返回 \texttt{false}，否则返回 \texttt{true}} & \texttt{(1 != 1) == false} \\
+  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
+  & \text{· bool} & & \\
+  & \text{· type} & & \\
+  \hline
+  \texttt{a > b} & \text{· 整型} & \text{· 如果 \texttt{a} 大于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(2 > 1) == true} \\
+  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a >= b} & \text{· 整型} & \text{· 如果 \texttt{a} 大于或等于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(2 >= 1) == true} \\
+  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a < b} & \text{· 整型} & \text{· 如果 \texttt{a} 小于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(1 < 2) == true} \\
+  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a <= b} & \text{· 整型} & \text{· 如果 \texttt{a} 小于或等于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(1 <= 2) == true} \\
+  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
+  \hline
+  \texttt{a ++ b} & \text{· 数组} & \text{Array concatenation} & \texttt{const mem = @import("std").mem;} \\
+  & & \text{· 只适用于 \texttt{a} 和 \texttt{b} 的长度在编译期已知时} & \texttt{const array1 = [\_]u32\{1, 2\};} \\
+  & & & \texttt{const array2 = [\_]u32\{3, 4\}} \\
+  & & & \texttt{const together = array1 ++ array2;} \\
+  & & & \texttt{mem.eql(u32, \&together, \&[\_]u32\{1, 2, 3, 4\})} \\
+  \hline
+  \texttt{a ** b} & \text{· 数组} & \text{Array multiplication} & \texttt{const mem = @import("std").mem;} \\
+  & & \text{· 只适用于 \texttt{a} 和 \texttt{b} 的长度在编译期已知时} & \texttt{const pattern = "ab" ** 3;} \\
+  & & & \texttt{mem.eql(u8, pattern, "ababab")} \\
+  \hline
+  \texttt{a.*} & \text{· 指针} & \text{Pointer dereference} & \texttt{const x: u32 = 1234;} \\
+  & & & \texttt{const ptr = \&x;} \\
+  & & & \texttt{ptr.* == 1234;} \\
+  \hline
+  \texttt{\&a} & \text{· 所有类型} & \text{Address of} & \texttt{const x: u32 = 1234;} \\
+  & & & \texttt{const ptr = \&x;} \\
+  & & & \texttt{ptr.* == 1234;} \\
+  \hline
+  \texttt{a || b} & \text{· Error Set Type} & \text{Merging Error Sets} & \texttt{const A = error\{One\};} \\
+  & & & \texttt{const B = error\{Two;\}} \\
+  & & & \texttt{(A || B) == error\{One, Two\}} \\
   \hline
 \end{array}
 $$
