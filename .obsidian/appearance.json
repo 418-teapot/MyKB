@@ -5,7 +5,8 @@
   "nativeMenus": false,
   "translucency": false,
   "enabledCssSnippets": [
-    "side_note"
+    "side_note",
+    "table"
   ],
   "theme": "obsidian",
   "interfaceFontFamily": "Noto Sans CJK SC"

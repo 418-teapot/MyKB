@@ -1,0 +1,125 @@
+ /* ==== 锁定表头和首列-阅读模式 By Linzeal 2024/1/4 ==== */
+
+/* 由于编辑模式尚有一些问题，当前分别拆分为编辑模式和阅读模式两个CSS */
+
+/* == 锁定表头和首列共同的格式预处理 == */
+.theme-dark
+{
+  --table-row-alt-background:#101010;  /*Obsidian官方CSS变量：交替的表隔行背景色，默认值为:var(--table-background)*/
+  --table-row-background-hover: DimGray ;  /*Obsidian官方CSS变量：表行悬停背景色，默认值为:var(--table-background)*/
+}
+
+.theme-light
+{
+  --table-row-alt-background:WhiteSmoke;  /*Obsidian官方CSS变量：交替的表隔行背景色，默认值为:var(--table-background)*/
+  --table-row-background-hover: LightYellow;  /*Obsidian官方CSS变量：表行悬停背景色，默认值为:var(--table-background)*/
+}
+
+table
+{
+  --table-white-space: nowrap;  /*Obsidian官方CSS变量：表格是否换行，默认值为:break-spaces*/
+  --table-header-color:var(--text-on-accent);  /*Obsidian官方CSS变量：表头文本颜色，默认值为:var(--text-normal)*/
+  --table-header-background: var(--color-accent);  /*Obsidian官方CSS变量：表头背景色，默认值为:var(--table-background)*/
+  --table-header-background-hover: var(--table-header-background);  /*Obsidian官方CSS变量：表头悬停背景色，默认值为:inherit*/
+  --table-row-alt-background-hover: var(--table-row-background-hover);  /*Obsidian官方CSS变量：交替的表隔行悬停背景色，默认值为:var(--table-background)*/
+  --table-drag-handle-background: var(--background-primary);  /*Obsidian官方CSS变量：表行列拖拽图标背景色，默认值为:transparent*/
+  --table-drag-handle-color: var(--table-drag-handle-background);  /*Obsidian官方CSS变量：表行列拖拽图标背景色，默认值为:var(--text-faint)*/
+}
+
+/* 表头背景色 */
+:is(
+table thead tr,
+table thead tr > th:nth-child(1),
+table thead .cm-active
+){
+  background-color:var(--table-header-background);
+}
+
+/* 表行背景色 */
+:is(
+table tbody tr,
+table tbody tr > td:nth-child(1)
+){
+  background-color: var(--background-primary);
+}
+
+/* 表隔行背景色 */
+:is(
+table tbody tr:nth-child(odd),
+table tbody tr:nth-child(odd) > td:nth-child(1)
+){
+  background-color:var(--table-row-alt-background);
+}
+
+/* 表行悬停高亮背景色 */
+:is(
+table tbody tr:hover,
+table tbody tr:hover td:nth-child(1)
+){
+  background-color:var(--table-row-background-hover) !important;
+}
+
+/* 选中格悬停动画，喜欢的可以取消注释来使用 
+:is(
+table th:hover,
+table td:hover
+){
+  transform: scale(1.05);
+  transition: all 0.1s cubic-bezier(0.11, 0.33, 0.23, 0.33);
+  border:2px solid var(--table-selection-border-color);
+}*/
+
+/* == 锁定表首列 == */
+
+/* 锁定表首列格式预处理 */
+/*.table-wrapper .table-editor div:has(> table) .markdown-source-view.mod-cm6 .cm-table-widget*/
+:is(
+.markdown-reading-view table
+){
+  /*max-width:100%; 表格显示的最大宽度。限定了宽度锁定表首列才有意义，否则表列就全部展开了*/
+}
+
+
+/* 锁定表头首格。z-index需比表头和表体首列的z-index更高 */
+:is(
+.markdown-reading-view table thead tr > th:nth-child(1)
+){
+  position: sticky !important;
+  left: 0;
+  top: 0;
+  z-index: 9;
+}
+
+/* 锁定表体首列。z-index需比表头首格的z-index低 */
+:is(
+.markdown-reading-view table tbody tr > td:nth-child(1)
+){
+  position: sticky !important;
+  left: 0;
+  z-index: 7;
+}
+
+/* ==== 锁定表头 ==== */
+
+/* 锁定表头。z-index需比表头首格的z-index低 */
+:is(
+.markdown-reading-view table thead tr 
+){
+  position: sticky !important;
+  top: 0;
+  z-index: 8;
+}
+
+/* 锁定表头格式预处理 */
+:is(
+.markdown-reading-view table
+){
+  max-height: 500px; /*表格显示的最大高度。限定了高度锁定表头才有意义，否则表行就全部展开了*/
+  overflow-y:auto;
+}
+
+:is(
+.markdown-reading-view table
+){
+  display:block;
+}
