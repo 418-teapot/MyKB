@@ -774,154 +774,47 @@ Zig 中不存在运算符重载。
 
 ## 运算符表
 
-$$
-\begin{array}{llll}
-  \hline
-  语法 & 关联类型 & 描述 & 示例 \\
-  \hline
-  \texttt{a + b} & \text{· 整型} & \text{Addition} & \texttt{2 + 5 == 7} \\
-  \texttt{a += b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a +\% b} & \text{· 整型} & \text{Wrapping Addition} & \texttt{@as(u32, std.math.maxInt(u32)) +\% 1 == 0} \\
-  \texttt{a +\%= b} & & \text{· 保证具有二进制补码回绕行为} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a +| b} & \text{· 整型} & \text{Saturating Addition} & \texttt{@as(u32, std.math.maxInt(u32)) +| 1 ==} \\
-  \texttt{a +|= b} & & \text{· 调用操作数的 Peer Type Resolution} & \texttt{@as(u32, std.math.maxInt(u32))} \\
-  \hline
-  \texttt{a - b} & \text{· 整型} & \text{Subtraction} & \texttt{2 - 5 == -3} \\
-  \texttt{a -= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a -\% b} & \text{· 整型} & \text{Wrapping Subration} & \texttt{@as(u32, 0) -\% 1 == std.math.maxInt(u32)} \\
-  \texttt{a -\%= b} & & \text{· 保证具有二进制补码回绕行为} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a -| b} & \text{· 整型} & \text{Saturating Subration} & \texttt{@as(u32, 0) -| 1 == 0} \\
-  \texttt{a -|= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{-a} & \text{· 整型} & \text{Negation} & \texttt{-1 == 0 - 1} \\
-  & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
-  \hline
-  \texttt{-\%a} & \text{· 整型} & \text{Wrapping Negation} & \texttt{-\%@as(i32, std.math.minInt(i32)) ==} \\
-  & & \text{· 保证具有二进制补码回绕行为} & \texttt{@as(i32. std.math.minInt(i32))} \\
-  \hline
-  \texttt{a * b} & \text{· 整型} & \text{Multiplication} & \texttt{2 * 5 == 10} \\
-  \texttt{a *= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a *\% b} & \text{· 整型} & \text{Wrapping Multiplication} & \texttt{@as(u8, 200) *\% 2 == 144} \\
-  \texttt{a *\%= b} & & \text{· 保证具有二进制补码回绕行为} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a *| b} & \text{· 整型} & \text{Saturating Multiplication} & \texttt{@as(u8, 200) *| 2 == 255} \\
-  \texttt{a *|= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a / b} & \text{· 整型} & \text{Division} & \texttt{10 / 5 == 2} \\
-  \texttt{a /= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
-  & & \text{· 在整型下可能发生除 0 异常} & \\
-  & & \text{· 在浮点型的 Optimized 模式下可能发生除 0 异常} & \\
-  & & \text{· 有符号整型必须编译期已知且为正数} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a \% b} & \text{· 整型} & \text{Remainder Division} & \texttt{10 \% 3 == 1} \\
-  \texttt{a \%= b} & \text{· 浮点型} & \text{· 在整型下可能发生溢出} & \\
-  & & \text{· 在整型下可能发生除 0 异常} & \\
-  & & \text{· 在浮点型的 Optimized 模式下可能发生除 0 异常} & \\
-  & & \text{· 有符号整型和浮点型必须编译期已知且为正数} & \\
-  & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a << b} & \text{· 整型} & \text{Bit Shift Left} & \texttt{1 << 8 == 256} \\
-  \texttt{a <<= b} & & \text{· \texttt{b} 必须为编译期已知或与 \texttt{a} 的位宽的 log2 对数具} \\
-  & & \text{有相同的类型} & \\
-  \hline
-  \texttt{a <<| b} & \text{· 整型} & \text{Saturating Bit Shift Left} & \texttt{@as(u8, 1) <<| 8 == 255} \\
-  \texttt{a <<|= b} & & & \\
-  \hline
-  \texttt{a >> b} & \text{· 整型} & \text{Bit Shift Right} & \texttt{10 >> 1 == 5} \\
-  \texttt{a >>= b} & & \text{· \texttt{b} 必须为编译期已知或与 \texttt{a} 的位宽的 log2 对数具} \\
-  & & \text{有相同的类型} & \\
-  \hline
-  \texttt{a \& b} & \text{· 整型} & \text{Bitwise AND} & \texttt{0b011 \& 0b101 == 0b001} \\
-  \texttt{a \&= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a | b} & \text{· 整型} & \text{Bitwise OR} & \texttt{0b010 \& 0b100 == 0b110} \\
-  \texttt{a |= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a \^{} b} & \text{· 整型} & \text{Bitwise XOR} & \texttt{0b011 \^{} 0b101 == 0b110} \\
-  \texttt{a \^{}\,= b} & & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{\~{} b} & \text{· 整型} & \text{Bitwise NOT} & \texttt{\~{}\,@as(u8, 0b10101111) == 0b01010000} \\
-  \hline
-  \texttt{a orelse b} & \text{· Optionals} & \text{当 \texttt{a} 为 \texttt{null} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: ?u32 = null;} \\
-  & & \text{\texttt{b} 的类型也有可能是 \texttt{noreturn} 类型} & \texttt{const unwrapped = value orelse 1234;} \\
-  & & & \texttt{unwrapped == 1234;} \\
-  \hline
-  \texttt{a.?} & \text{· Optionals} & \text{等价于 \texttt{a orelse unreachable}} & \texttt{const value: ?u32 = 5678;} \\
-  & & & \texttt{value.? == 5678} \\
-  \hline
-  \texttt{a catch b} & \text{· Error Unions} & \text{当 \texttt{a} 为 \texttt{error} 时，返回 \texttt{b}；否则返回 \texttt{a} 的拆包} & \texttt{const value: anyerror!u32 = error.Broken;} \\
-  \texttt{a catch |err| b} & & \text{\texttt{b} 的类型也有可能是 \texttt{noreturn} 类型} & \texttt{const unwrapped = value catch 1234;} \\
-  & & \text{\texttt{err} 是一个定义在表达式 \texttt{b} 作用域的 \texttt{error}} & \texttt{unwrapped == 1234} \\
-  \hline
-  \texttt{a and b} & \text{· bool} & \text{如果 \texttt{a} 为 \texttt{false}，直接返回 \texttt{false}} & \texttt{(false and true) == false} \\
-  & & \text{否则返回 \texttt{b}} & \\
-  \hline
-  \texttt{a or b} & \text{· bool} & \text{如果 \texttt{a} 为 \texttt{true}，直接返回 \texttt{true}} & \texttt{(false or true) == true} \\
-  & & \text{否则返回 \texttt{b}} & \\
-  \hline
-  \texttt{!a} & \text{· bool} & \text{布尔 NOT} & \texttt{!false == true} \\
-  \hline
-  \texttt{a == b} & \text{· 整型} & \text{· 如果 \texttt{a} 与 \texttt{b} 相等返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(1 == 1) == true} \\
-  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
-  & \text{· bool} & & \\
-  & \text{· type} & & \\
-  \hline
-  \texttt{a == null} & \text{· Optionals} & \text{如果 \texttt{a} 为 \texttt{null} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{const value: ?u32 = null;} \\
-  & & & \texttt{value == null} \\
-  \hline
-  \texttt{a != b} & \text{· 整型} & \text{· 如果 \texttt{a} 与 \texttt{b} 相等返回 \texttt{false}，否则返回 \texttt{true}} & \texttt{(1 != 1) == false} \\
-  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
-  & \text{· bool} & & \\
-  & \text{· type} & & \\
-  \hline
-  \texttt{a > b} & \text{· 整型} & \text{· 如果 \texttt{a} 大于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(2 > 1) == true} \\
-  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a >= b} & \text{· 整型} & \text{· 如果 \texttt{a} 大于或等于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(2 >= 1) == true} \\
-  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a < b} & \text{· 整型} & \text{· 如果 \texttt{a} 小于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(1 < 2) == true} \\
-  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a <= b} & \text{· 整型} & \text{· 如果 \texttt{a} 小于或等于 \texttt{b} 返回 \texttt{true}，否则返回 \texttt{false}} & \texttt{(1 <= 2) == true} \\
-  & \text{· 浮点型} & \text{· 调用操作数的 Peer Type Resolution} & \\
-  \hline
-  \texttt{a ++ b} & \text{· 数组} & \text{Array concatenation} & \texttt{const mem = @import("std").mem;} \\
-  & & \text{· 只适用于 \texttt{a} 和 \texttt{b} 的长度在编译期已知时} & \texttt{const array1 = [\_]u32\{1, 2\};} \\
-  & & & \texttt{const array2 = [\_]u32\{3, 4\}} \\
-  & & & \texttt{const together = array1 ++ array2;} \\
-  & & & \texttt{mem.eql(u32, \&together, \&[\_]u32\{1, 2, 3, 4\})} \\
-  \hline
-  \texttt{a ** b} & \text{· 数组} & \text{Array multiplication} & \texttt{const mem = @import("std").mem;} \\
-  & & \text{· 只适用于 \texttt{a} 和 \texttt{b} 的长度在编译期已知时} & \texttt{const pattern = "ab" ** 3;} \\
-  & & & \texttt{mem.eql(u8, pattern, "ababab")} \\
-  \hline
-  \texttt{a.*} & \text{· 指针} & \text{Pointer dereference} & \texttt{const x: u32 = 1234;} \\
-  & & & \texttt{const ptr = \&x;} \\
-  & & & \texttt{ptr.* == 1234;} \\
-  \hline
-  \texttt{\&a} & \text{· 所有类型} & \text{Address of} & \texttt{const x: u32 = 1234;} \\
-  & & & \texttt{const ptr = \&x;} \\
-  & & & \texttt{ptr.* == 1234;} \\
-  \hline
-  \texttt{a || b} & \text{· Error Set Type} & \text{Merging Error Sets} & \texttt{const A = error\{One\};} \\
-  & & & \texttt{const B = error\{Two;\}} \\
-  & & & \texttt{(A || B) == error\{One, Two\}} \\
-  \hline
-\end{array}
-$$
+| 名称                       | 语法                                                    | 类型                           | 描述                                                                                                                                                                                         | 示例                                                                                                                                                                                              |
+| -------------------------- | ------------------------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Addition                   | <code>a + b<br>a += b</code>                            | 整型<br>浮点型                 | 在整型下可能发生溢出<br>调用操作数的 Peer Type Resolution                                                                                                                                    | <code>2 + 5 == 7<code>                                                                                                                                                                            |
+| Wrapping Addition          | <code>a +% b<br>a +%= b</code>                          | 整型                           | 补码回绕行为<br>调用操作数的 Peer Type Resolution                                                                                                                                            | <code>@as(u32, 0xffffffff) +% 1 == 0</code>                                                                                                                                                       |
+| Saturating Addition        | <code>a +&verbar; b<br>a +&verbar;= b</code>            | 整型                           | 调用操作数的 Peer Type Resolution                                                                                                                                                            | <code>@as(u8, 255) +&verbar; 1 == @as(u8, 255)</code>                                                                                                                                             |
+| Subtraction                | <code>a - b<br>a -= b</code>                            | 整型<br>浮点型                 | 在整型下可能发生溢出<br>调用操作数的 Peer Type Resolution                                                                                                                                    | <code>2 - 5 == -3</code>                                                                                                                                                                          |
+| Wrapping Subtraction       | <code>a -% b<br>a -%= b</code>                          | 整型                           | 补码回绕行为<br>调用操作数的 Peer Type Resolution                                                                                                                                            | <code>@as(u8, 0) -%1 == 255</code>                                                                                                                                                                |
+| Saturating Subtraction     | <code>a -&verbar; b<br>a -&verbar;= b</code>            | 整型                           | 调用操作数的 Peer Type Resolution                                                                                                                                                            | <code>@as(u32, 0) -&verbar; 1 == 0</code>                                                                                                                                                         |
+| Negation                   | <code>-a</code>                                         | 整型<br>浮点型                 | 在整型下可能发生溢出                                                                                                                                                                         | <code>-1 == 0 - 1</code>                                                                                                                                                                          |
+| Wrapping Negation          | <code>-%a</code>                                        | 整型                           | 补码回绕行为                                                                                                                                                                                 | <code>-%@as(i8, -127) == -127</code>                                                                                                                                                              |
+| Multiplication             | <code>a &ast; b<br>a &ast;= b</code>                    | 整型<br>浮点型                 | 在整型下可能发生溢出<br>调用操作数的 Peer Type Resolution                                                                                                                                    | <code>2 &ast; 5 == 10</code>                                                                                                                                                                      |
+| Wrapping Multiplication    | <code>a &ast;% b<br>a &ast;%= b</code>                  | 整型                           | 补码回绕行为<br>调用操作数的 Peer Type Resolution                                                                                                                                            | <code>@as(u8, 200) &ast;% 2 == 144</code>                                                                                                                                                         |
+| Saturating Multiplication  | <code>a &ast;&verbar; b<br>a &ast;&verbar;= b</code>    | 整型                           | 调用操作数的 Peer Type Resolution                                                                                                                                                            | <code>@as(u8, 200) &ast;&verbar; 2 == 255</code>                                                                                                                                                  |
+| Division                   | <code>a / b<br>a /= b</code>                            | 整型<br>浮点型                 | 在整型下可能发生溢出<br>在整型下可能发生除 0 异常<br>在浮点型的 Optimized 模式下可能发生除 0 异常<br>操作数为有符号整型时必须编译期已知且为正数<br>调用操作数的 Peer Type Resolution         | <code>10 / 5 == 2</code>                                                                                                                                                                          |
+| Remainder Division         | <code>a % b<br>a %= b</code>                            | 整型<br>浮点型                 | 在整型下可能发生溢出<br>在整型下可能发生除 0 异常<br>在浮点型的 Optimized 模式下可能发生除 0 异常<br>操作数为有符号整型或浮点型时必须编译期已知且为正数<br>调用操作数的 Peer Type Resolution | <code>10 % 3 == 1</code>                                                                                                                                                                          |
+| Bit Shift Left             | <code>a << b<br>a <<= b</code>                          | 整型                           | 将所有位向左移动，在最低有效为插入 0<br> `b` 必须为编译期已知，或具有与 `a` 的位数的 log2 对数相同的类型                                                                                     | <code>0b1 << 8 == 0b100000000</code>                                                                                                                                                              |
+| Saturating Bit Shift Left  | <code>a <<&verbar; b<br>a <<&verbar;= b</code>          | 整型                           |                                                                                                                                                                                              | <code>@as(u8, 1) <<&verbar; 8 == 255</code>                                                                                                                                                       |
+| Bit Shift Right            | <code>a >> b<br>a >>= b</code>                          | 整型                           | 将所有位向右移动，在最高有效位插入 0<br>`b` 必须为编译期已知，或具有与 `a` 的位数的 log2 对数相同的类型                                                                                      | <code>0b1010 >> 1 == 0b101</code>                                                                                                                                                                 |
+| Bitwise And                | <code>a & b<br>a &= b</code>                            | 整型                           | 调用操作数的 Peer Type Resolution                                                                                                                                                            | <code>0b011 & 0b101 == 0b001</code>                                                                                                                                                               |
+| Bitwise Or                 | <code>a &verbar; b<br>a &verbar;= b</code>              | 整型                           | 调用操作数的 Peer Type Resolution                                                                                                                                                            | <code>0b010 &verbar; 0b100 == 0b110</code>                                                                                                                                                        |
+| Bitwise Xor                | <code>a ^ b<br>a ^= b</code>                            | 整型                           | 调用操作数的 Peer Type Resolution                                                                                                                                                            | <code>0b011 ^ 0b101 == 0b110</code>                                                                                                                                                               |
+| Bitwise Not                | <code>~a</code>                                         | 整型                           |                                                                                                                                                                                              | <code>~@as(u8, 0b10101111) == 0b01010000</code>                                                                                                                                                   |
+| Defaulting Optional Unwrap | <code>a orelse b</code>                                 | Optionals                      | 如果 `a` 为 `null`，返回 `b`（"default value"），否则返回 `a` 的拆包<br>`b` 的类型可能为 `noreturn` 类型                                                                                     | <code>const value: ?u32 = null;<br>const unwrapped = value orelse 1234;<br>unwrapped == 1234</code>                                                                                               |
+| Optional Unwrap            | <code>a.?</code>                                        | Optionals                      | 等价于 <code>a orelse unreachable</code>                                                                                                                                                     | <code>const value: ?u32 = 5678;<br>value.? == 5678</code>                                                                                                                                         |
+| Defaulting Error Unwrap    | <code>a catch b<br>a catch &verbar;err&verbar; b</code> | Error Unions                   | 如果 `a` 为 `error`，返回 `b`（"default value），否则返回 `a` 的拆包<br>`b` 的类型可能为 `noreturn` 类型<br>`err` 为表达式 `b` 作用域内的 `error`                                            | <code>const value: anyerror!u32 = error.Broken;<br>const unwrapped = value catch 1234;<br>unwrapped == 1234</code>                                                                                |
+| Logical And                | <code>a and b</code>                                    | bool                           | 如果 `a` 为 `false`，直接返回 `false`，否则返回 `b`                                                                                                                                          | <code>(false and true) == false</code>                                                                                                                                                            |
+| Logical Or                 | <code>a or b</code>                                     | bool                           | 如果 `a` 为 `true`，直接返回 `true`，否则返回 `b`                                                                                                                                            | <code>(false or true) == true</code>                                                                                                                                                              |
+| Boolean Not                | <code>!a</code>                                         | bool                           |                                                                                                                                                                                              | <code>!false == true</code>                                                                                                                                                                       |
+| Equality                   | <code>a == b</code>                                     | 整型<br>浮点型<br>bool<br>type | 如果 `a` 和 `b` 相等，返回 `true`，否则返回 `false`<br>调用操作数的 Peer Type Resolution                                                                                                     | <code>(1 == 1) == true</code>                                                                                                                                                                     |
+| Null Check                 | <code>a == null</code>                                  | Optionals                      | 如果 `a` 为 `null`，返回 `true`，否则返回 `false`                                                                                                                                            | <code>const value: ?u32 = null;<br>(value == null) == true</code>                                                                                                                                 |
+| Inequality                 | <code>a != b</code>                                     | 整型<br>浮点型<br>bool<br>type | 如果 `a` 和 `b` 相等，返回 `false`，否则返回 `true`<br>调用操作数的 Peer Type Resolution                                                                                                     | <code>(1 != 1) == false</code>                                                                                                                                                                    |
+| Non-Null Check             | <code>a != null</code>                                  | Optionals                      | 如果 `a` 为 `null`，返回 `false`，否则返回 `true`                                                                                                                                            | <code>const value: ?u32 = null;<br>(value != null) == false</code>                                                                                                                                |
+| Greater Than               | <code>a > b</code>                                      | 整型<br>浮点型                 | 如果 `a` 大于 `b`，返回 `true`，否则返回 `false`<br>调用操作数的 Peer Type Resolution                                                                                                        | <code>(2 > 1) == true</code>                                                                                                                                                                      |
+| Greater or Equal           | <code>a >= b</code>                                     | 整型<br>浮点型                 | 如果 `a` 大于或等于 `b`，返回 `true`，否则返回 `false`<br>调用操作数的 Peer Type Resolution                                                                                                  | <code>(2 >= 1) == true</code>                                                                                                                                                                     |
+| Less Than                  | <code>a &lt; b</code>                                   | 整型<br>浮点型                 | 如果 `a` 小于 `b`，返回 `true`，否则返回 `false`<br>调用操作数的 Peer Type Resolution                                                                                                        | <code>(1 &gt; 2) == ture</code>                                                                                                                                                                   |
+| Less or Equal              | <code>a &lt;= b</code>                                  | 整型<br>浮点型                 | 如果 `a` 小于或等于 `b`，返回 `true`，否则返回 `false`<br>调用操作数的 Peer Type Resolution                                                                                                  | <code>(1 &lt;= 2) == true</code>                                                                                                                                                                  |
+| Array Concatenation        | <code>a ++ b</code>                                     | Arrays                         | `a` 和 `b` 的长度必须编译期已知                                                                                                                                                              | <code>const mem = @import("std").mem;<br>const array1 = [*]u32{1, 2};<br>const array2 = [*]u32{3, 4};<br>const together = array1 ++ array2;<br>mem.eql(u32, &together, &[_]u32{1, 2, 3, 4}</code> |
+| Array Multiplication       | <code>a ** b</code>                                     | Arrays                         | `a` 和 `b` 的长度必须编译期已知                                                                                                                                                              | <code>const mem = @import("std").mem;<br>const pattern = "ab" ** 3;<br>mem.eql(u8, pattern, "ababab")</code>                                                                                      |
+| Pointer Dereference        | <code>a.*</code>                                        | Pointers                       | 指针解引用                                                                                                                                                                                   | <code>const x: u32 = 1234;<br>const ptr = &x;<br>ptr.* == 1234</code>                                                                                                                             |
+| Address Of                 | <code>&a</code>                                         | All Types                      |                                                                                                                                                                                              | <code>const x: u32 = 1234;<br>const ptr = &x;<br>ptr.* == 1234</code>                                                                                                                             |
+| Error Set Merge            | <code>a &verbar;&verbar; b</code>                       | Error Set Type                 | 错误集合并                                                                                                                                                                                   | <code>const A = error{One};<br>const B = error{Two};<br>(A &verbar;&verbar; B) == error{One, Two}</code>                                                                                          | 
 
 ## 运算符优先级
 
