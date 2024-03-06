@@ -972,3 +972,19 @@ test "multidimensional arrays" {
   }
 }
 ```
+
+## 哨兵终止数组
+
+使用 `[N:x]T` 语法可以描述一个长度为 `N` 的数组，在该数组的末尾有一个值为 `x` 的哨兵元素（sentinel element），该数组被称为哨兵终止数组（sentinel-terminated array）。
+
+```zig file:test_null_terminated_array.zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+test "0-terminated sentinel array" {
+  const array = [_:0]u8 {1, 2, 3, 4};
+  try expect(@TypeOf(array) == [4:0]u8);
+  try expect(array.len == 4);
+  try expect(array[4] == 0);
+}
+```
