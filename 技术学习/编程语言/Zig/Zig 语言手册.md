@@ -1213,3 +1213,46 @@ test "comptime @ptrFromInt" {
   }
 }
 ```
+
+## `volatile`
+
+在 Zig 中，load 和 store 操作被假定为没有副作用。如果给定的 load 或 store 操作应该具有副作用，例如 Memory Mapped Input/Output (MMIO)，需要使用 `volatile` 操作。在下面的代码中，对于 `mmio_ptr` 的 load 和 store 操作保证一定会发生，并且会按照源文件中的顺序执行：
+
+```zig file:test_volatile.zig
+const expect = @import("std").testing.expect;
+
+test "volatile" {
+  const mmio_ptr: *volatile u8 = @ptrFromInt(0x12345678);
+  try expect(@TypeOf(mmio_ptr) == *volatile u8);
+}
+```
+
+需要注意的是，`volatile` 与并发性和原子性无关。如果在 MMIO 之外使用了 `volatile`，这可能是一个 bug。
+
+`@ptrCast` 可以将一个指针的元素类型转为其他类型。这会创建一个新指针，对于该指针的 load 和 store 操作，可能会产生无法检测到的非法行为。通常情况下，使用其他的类型转换方式要比 `@ptrCast` 更好。
+
+```zig file:test_pointer_casting.zig
+const std = @import("std");
+const expect = std.testing.expect;
+
+test "pointer casting" {
+  const byte align(@alignOf(u32)) = [_]u8 {0x12, 0x12, 0x12, 0x12};
+  const u32_ptr: *const u32 = @ptrCast(&bytes);
+  try expect(u32_ptr.* == 0x12121212);
+
+  // Even this example is contrived - there are better ways to do the
+  // above than pointer casting. For example, using a slice narrowing
+  // cast:
+  const u32_value = std.mem.bytesAsSlice(u32, bytes[0..])[0];
+  try expect(u32_value == 0x12121212);
+
+  // And even another way, the most straightforward way to do it:
+  try expect(@as(u32, @bitCast(bytes)) == 0x12121212);
+}
+
+test "pointer child type" {
+  // Pointer types have a `child` field which tells you the type they
+  // point to.
+  try expect(@typeInfo(*u32).Pointer.child == u32);
+}
+```
