@@ -1051,3 +1051,165 @@ test "Conversion between vectors, arrays and slices" {
   try expectEqual(vec2, vec3);
 }
 ```
+
+---
+
+# 指针
+
+Zig 有两种类型的指针：单项指针（single-item）和多项指针（many-item）。
+
+- `*T` —— 单项指针指向单个元素。
+  - 支持解引用语法：`ptr.*`
+- `[*]T` —— 多项指针指向未知数量的多个元素。
+  - 支持索引语法：`ptr[i]`
+  - 支持切片语法：`ptr[start..end]` 和 `ptr[start..]`
+  - 支持指针算数运算：`ptr + x` 和 `ptr - x`
+  - 类型 `T` 必须有一个确定的大小，这意味着 `T` 不能为 `anyopaque` 类型或其他任意的 `opaque` 类型
+
+这些类型与数组和切片紧密相关：
+
+- `*[N]T` —— 指向 N 个元素的指针，也可以当作指向一个数组的单项指针。
+  - 支持索引语法：`array_ptr[i]`
+  - 支持切片语法：`array_ptr[start..end]`
+  - 支持长度属性：`array_ptr.len`
+- `[]T` —— 切片（胖指针，包含一个 `[*]T` 类型的指针和一个长度）
+  - 支持索引语法：`slice[i]`
+  - 支持切片语法：`slice[start..end]`
+  - 支持长度属性：`slice.len`
+
+可以使用 `&x` 来获取单项指针：
+
+```zig file:test_single_item_pointer.zig
+const expect = @import("std").testing.expect;
+
+test "address of syntax" {
+  // Get the address of a variable:
+  const x: i32 = 1234;
+  const x_ptr = &x;
+
+  // Dereference a pointer:
+  try expect(x_ptr.* == 1234);
+
+  // When you get the address of a const variable, you get a const
+  // single-item pointer.
+  try expect(@TypeOf(x_ptr) == *const i32);
+
+  // If you want to mutate the value, you'd need an address of a mutable
+  // variable:
+  var y: i32 = 5678;
+  const y_ptr = &y;
+  try expect(@TypeOf(y_ptr) == *i32);
+  y_ptr.* += 1;
+  try expect(y_ptr.* == 5679);
+}
+
+test "pointer array access" {
+  // Taking an address of an individual element gives a single-item
+  // pointer. This kind of pointer does not support pointer arithmetic.
+  var array = [_]u8 {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  const ptr = &array[2];
+  try expect(@TypeOf(ptr) == *u8);
+
+  try expect(array[2] == 3);
+  ptr.* += 1;
+  try expect(array[2] == 4);
+}
+```
+
+Zig 支持指针的算数运算。在进行指针的算数运算时，最好显示地操作一个 `[*]T` 类型的指针。如果直接操作切片，可能会发生损坏。
+
+```zig file:test_pointer_arithmetic.zig
+const expect = @import("std").testing.expect;
+
+test "pointer arithmetic with many-item-pointer" {
+  const array = [_]i32 {1, 2, 3, 4};
+  var ptr: [*]const i32 = &array;
+
+  try expect(ptr[0] == 1);
+  ptr += 1;
+  try expect(ptr[0] == 2);
+
+  // slicing a many-item pointer without an end is equivalent to pointer
+  // arithmetic: `ptr[start..] == ptr + start`
+  try expect(ptr[1..] == ptr + 1);
+}
+
+test "pointer arithmetic with slice" {
+  var array = [_]i32 {1, 2, 3, 4};
+  var length: usize = 0; // var to make it runtime-known
+  _ = &length; // suppress 'var is never mutated' error
+  var slice = array[length..array.len];
+
+  try expect(slice[0] == 1);
+  try expect(slice.len == 4);
+
+  slice.ptr += 1;
+  // now the slice is in an bad state since len has not been updated
+  try expect(slice[0] == 2);
+  try expect(slice.len == 4);
+}
+```
+
+在 Zig 中，我们更偏爱切片而不是哨兵终止指针，因为切片具有边界检查，可以防止未定义行为。
+
+```zig file:test_slice_bounds.zig
+const expect = @import("zig").testing.expect;
+
+test "pointer slice" {
+  var array = [_]u8 {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  var start: usize = 2; // var to make it runtime-known
+  _ = &start; // suppress 'var is never mutated' error
+  const slice = array[start..4];
+  try expect(slice.len == 2);
+
+  try expect(array[3] == 4);
+  slice[1] += 1;
+  try expect(array[3] == 5);
+}
+```
+
+只要代码不依赖于未定义的内存分布，指针也可以在编译期工作：
+
+```zig file:test_comptime_pointers.zig
+const expect = @import("std").testing.expect;
+
+test "comptime pointers" {
+  comptime {
+    var x: i32 = 1;
+    const ptr = &x;
+    ptr.* += 1;
+    x += 1;
+    try expect(ptr.* == 3);
+  }
+}
+```
+
+可以使用 `@ptrFromInt` 将整数形式的地址转为指针，反之使用 `@intFromPtr`：
+
+```zig file:test_integer_pointer_conversion.zig
+const expect = @import("std").testing.expect;
+
+test "@intFromPtr and @ptrFromInt" {
+  const ptr: *i32 = @ptrFromInt(0xdeadbee0);
+  const addr = @intFromPtr(ptr);
+  try expect(@TypeOf(addr) == usize);
+  try expect(addr == 0xdeadbee0);
+}
+```
+
+只要指针不会被解引用，Zig 可以在 `comptime` 代码中保留内存地址：
+
+```zig file:test_comptime_pointer_conversion.zig
+const expect = @import("std").testing.expect;
+
+test "comptime @ptrFromInt" {
+  comptime {
+    // Zig is able to do this at compile-time, as long as ptr is never
+    // dereferenced.
+    const ptr: *i32 = @ptrFromInt(0xdeadbee0);
+    const addr = @intFromPtr(ptr);
+    try expect(@TypeOf(addr) == usize);
+    try expect(addr == 0xdeadbee0);
+  }
+}
+```
