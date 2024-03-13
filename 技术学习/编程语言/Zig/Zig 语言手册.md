@@ -1338,3 +1338,18 @@ $ zig test test_incorrect_pointer_alignment.zig
 1/1 test_incorrect_pointer_alignment.test.pointer alignment safety... thread 3324863 panic: incorrect alignment
 ...
 ```
+
+## `allowzero`
+
+该属性允许指针的地址为 0 地址。如果要表示空指针，需要使用 optional 指针。带有 `allowzero` 的 optional 指针的大小与普通指针的大小并不相同。在下面的代码示例中，如果没有带上 `allowzero` 属性，将会产生 Pointer Cast Invalid Null 错误：
+
+```zig file:test_allowzero.zig
+const expect = @import("std").testing.expect;
+
+test "allowzero" {
+  var zero: usize = 0; // var to make to runtime-known
+  _ = &zero; // suppress 'var is never mutated' error
+  const ptr: *allowzero i32 = @ptrFromInt(zero);
+  try expect(@intFromPtr(ptr) == 0);
+}
+```
