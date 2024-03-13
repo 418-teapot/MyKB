@@ -1256,3 +1256,85 @@ test "pointer child type" {
   try expect(@typeInfo(*u32).Pointer.child == u32);
 }
 ```
+
+## 对齐
+
+每种类型都有一个对齐方式，当从内存 load 或 store 该类型的值时，其内存地址必须能被该数字整除。可以使用 `@alignOf` 找出任一类型的对齐方式。
+
+对齐取决于 CPU 架构，但始终为 2 的幂，且小于 `1 << 29`。
+
+在 Zig 中，指针类型具有对齐值。如果该值等于基础类型的对齐，则可以从类型中省略它：
+
+```zig file:test_variable_alignment.zig
+const std = @import("std");
+const builtin = @import("builtin");
+const expect = std.testing.expect;
+
+test "variable alignment" {
+  var x: i32 = 1234;
+  const align_of_i32 = @alignOf(@TypeOf(x));
+  try expect(@TypeOf(&x) == *i32);
+  try expect(*i32 = *align(align_of_i32) i32);
+  if (builtin.target.cpu.arch = .x86_64) {
+    try expect(@typeInfo(*i32).Pointer.alignment == 4);
+  }
+}
+```
+
+就像 `*i32` 可以强制转为 `*const i32` 一样，具有较大对齐方式的指针可以隐式转为具有较小对齐方式的指针，但反之则不然。
+
+可以指定变量和函数的对齐方式，这样指向它们的指针将获得指定的对齐方式：
+
+```zig file:test_variable_func_alignment.zig
+const expect = @import("std").testing.expect;
+
+var foo: u8 align(4) = 100;
+
+test "global variable alignment" {
+  try expect(@typeInfo(@TypeOf(&foo)).Pointer.alignment == 4);
+  try expect(@TypeOf(&foo) == *align(4) u8);
+  const as_pointer_to_array: *align(4) [1]u8 = &foo;
+  const as_slice: []align(4) u8 = as_pointer_to_array;
+  const as_unaligned_slice: []u8 = as_slice;
+  try expect(as_unaligned_slice[0] == 100);
+}
+
+fn derp() align(@sizeOf(usize) * 2) i32 {
+  return 1234;
+}
+fn noop1() align(1) void {}
+fn noop4() align(4) void {}
+
+test "function alignment" {
+  try expect(derp() == 1234);
+  try expect(@TypeOf(noop1) == fn() align(1) void);
+  try expect(@TypeOf(noop2) == fn() align(4) void);
+  noop1();
+  noop2();
+}
+```
+
+如果一个给定的指针或切片的对齐方式较小，但你知道其具有更大的对齐方式，可以使用 `@alignCast` 对指针进行转换。这在运行时不会产生额外操作，但会插入一个安全检查：
+
+```zig file:test_incorrect_pointer_alignment.zig
+const std = @import("std");
+
+test "pointer alignment safety" {
+  var array align(4) = [_]u32 {0x11111111, 0x11111111};
+  const bytes = std.mem.sliceAsBytes(array[0..]);
+  try std.testing.expect(foo(bytes) == 0x11111111);
+}
+
+fn foo(bytes: []u8) u32 {
+  const slice4 = bytes[1..5];
+  const int_slice = std.mem.bytesAsSlice(
+    u32, @as([]align(4) u8, @alignCast(slice4)));
+  return int_slice[0];
+}
+```
+
+```bash title:Shell
+$ zig test test_incorrect_pointer_alignment.zig
+1/1 test_incorrect_pointer_alignment.test.pointer alignment safety... thread 3324863 panic: incorrect alignment
+...
+```
