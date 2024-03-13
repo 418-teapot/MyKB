@@ -1353,3 +1353,29 @@ test "allowzero" {
   try expect(@intFromPtr(ptr) == 0);
 }
 ```
+
+## 哨兵终止指针
+
+使用 `[*:x]T` 可以表示一个以 `x` 作为终止哨兵值的指针。这提供了对缓冲区溢出和读越界的保护。
+
+```zig file:sentinel-terminated_pointer.zig
+const std = @import("std");
+
+// This is also available as `std.c.printf`.
+pub extern "c" fn printf(format: [*:0]const u8, ...) c_int;
+
+pub fn main() anyerror!void {
+  _ = printf("Hello, world!\n"); // OK
+
+  const msg = "Hello, world!\n";
+  const non_null_terminated_msg: [msg.len]u8 = msg.*;
+  _ = printf(&non_null_terminated_msg);
+}
+```
+
+```bash title:Shell
+$ zig build-exe sentinel-terminated_pointer.zig -lc
+sentinel-terminated_pointer.zig:11:16: error: expected type '[*:0]const u8', found '*const [14]u8'
+    _ = printf(&non_null_terminated_msg);
+               ^~~~~~~~~~~~~~~~~~~~~~~~
+```
