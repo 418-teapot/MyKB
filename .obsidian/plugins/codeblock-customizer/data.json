@@ -9,7 +9,9 @@
           "codeBlockBorderStylingPosition": "disable",
           "showIndentationLines": false,
           "enableCopyCodeButton": false,
-          "enableLinks": false
+          "enableLinks": false,
+          "enableLinkUpdate": false,
+          "textHighlight": true
         },
         "semiFold": {
           "enableSemiFold": false,
@@ -69,7 +71,8 @@
             "backgroundColor": "--code-background",
             "textColor": "--code-normal"
           },
-          "editorActiveLineColor": "--color-base-20"
+          "editorActiveLineColor": "--color-base-20",
+          "languageSpecificColors": {}
         },
         "light": {
           "codeblock": {
@@ -95,7 +98,8 @@
             "backgroundColor": "--code-background",
             "textColor": "--code-normal"
           },
-          "editorActiveLineColor": "--color-base-20"
+          "editorActiveLineColor": "--color-base-20",
+          "languageSpecificColors": {}
         }
       }
     },
@@ -108,7 +112,9 @@
           "codeBlockBorderStylingPosition": "disable",
           "showIndentationLines": false,
           "enableCopyCodeButton": false,
-          "enableLinks": false
+          "enableLinks": false,
+          "enableLinkUpdate": false,
+          "textHighlight": true
         },
         "semiFold": {
           "enableSemiFold": false,
@@ -168,7 +174,8 @@
             "backgroundColor": "#054b5c",
             "textColor": "#DADADA"
           },
-          "editorActiveLineColor": "#468eeb33"
+          "editorActiveLineColor": "#468eeb33",
+          "languageSpecificColors": {}
         },
         "light": {
           "codeblock": {
@@ -194,7 +201,8 @@
             "backgroundColor": "#E9DFBA",
             "textColor": "#866704"
           },
-          "editorActiveLineColor": "#60460633"
+          "editorActiveLineColor": "#60460633",
+          "languageSpecificColors": {}
         }
       }
     }
@@ -209,7 +217,9 @@
         "codeBlockBorderStylingPosition": "disable",
         "showIndentationLines": false,
         "enableCopyCodeButton": false,
-        "enableLinks": false
+        "enableLinks": false,
+        "enableLinkUpdate": false,
+        "textHighlight": true
       },
       "semiFold": {
         "enableSemiFold": false,
@@ -269,7 +279,8 @@
           "backgroundColor": "--code-background",
           "textColor": "--code-normal"
         },
-        "editorActiveLineColor": "--color-base-20"
+        "editorActiveLineColor": "--color-base-20",
+        "languageSpecificColors": {}
       },
       "light": {
         "codeblock": {
@@ -295,7 +306,8 @@
           "backgroundColor": "--code-background",
           "textColor": "--code-normal"
         },
-        "editorActiveLineColor": "--color-base-20"
+        "editorActiveLineColor": "--color-base-20",
+        "languageSpecificColors": {}
       }
     }
   },
@@ -303,5 +315,8 @@
   "newThemeName": "",
   "alternateHighlightColorName": "",
   "languageBorderColorName": "",
-  "foldAllCommand": false
+  "foldAllCommand": false,
+  "settingsType": "basic",
+  "langSpecificSettingsType": "",
+  "languageSpecificLanguageName": ""
 }
