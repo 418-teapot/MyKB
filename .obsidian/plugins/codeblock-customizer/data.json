@@ -223,7 +223,7 @@
         "collapsedCodeText": "",
         "codeblockLangBoldText": true,
         "codeblockLangItalicText": true,
-        "alwaysDisplayCodeblockLang": false,
+        "alwaysDisplayCodeblockLang": true,
         "alwaysDisplayCodeblockIcon": false,
         "displayCodeBlockLanguage": true,
         "displayCodeBlockIcon": false
