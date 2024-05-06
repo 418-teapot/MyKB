@@ -2,5 +2,7 @@
   "obsidian-linter",
   "codeblock-customizer",
   "obsidian-style-settings",
-  "table-editor-obsidian"
+  "table-editor-obsidian",
+  "dataview",
+  "dbfolder"
 ]
