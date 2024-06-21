@@ -1,6 +1,7 @@
 {
   "Themes": {
     "Obsidian": {
+      "baseTheme": "Obsidian",
       "settings": {
         "codeblock": {
           "enableLineNumbers": true,
@@ -11,7 +12,12 @@
           "enableCopyCodeButton": false,
           "enableLinks": false,
           "enableLinkUpdate": false,
-          "textHighlight": true
+          "textHighlight": true,
+          "enableBracketHighlight": true,
+          "highlightNonMatchingBrackets": true,
+          "inverseFold": false,
+          "enableSelectionMatching": false,
+          "unwrapcode": false
         },
         "semiFold": {
           "enableSemiFold": false,
@@ -39,7 +45,8 @@
         },
         "printing": {
           "enablePrintToPDFStyling": false,
-          "forceCurrentColorUse": false
+          "forceCurrentColorUse": false,
+          "uncollapseDuringPrint": true
         },
         "common": {
           "enableInSourceMode": false
@@ -53,7 +60,13 @@
             "backgroundColor": "--code-background",
             "highlightColor": "--text-highlight-bg",
             "alternateHighlightColors": {},
-            "languageBorderColors": {}
+            "languageBorderColors": {},
+            "textColor": "#A30505",
+            "bracketHighlightColorMatch": "#f33bff",
+            "bracketHighlightColorNoMatch": "#FF0000",
+            "bracketHighlightBackgroundColorMatch": "--color-base-30",
+            "bracketHighlightBackgroundColorNoMatch": "--color-base-30",
+            "selectionMatchHighlightColor": "#99ff7780"
           },
           "header": {
             "backgroundColor": "--code-background",
@@ -80,7 +93,13 @@
             "backgroundColor": "--code-background",
             "highlightColor": "--text-highlight-bg",
             "alternateHighlightColors": {},
-            "languageBorderColors": {}
+            "languageBorderColors": {},
+            "textColor": "#A30505",
+            "bracketHighlightColorMatch": "#f33bff",
+            "bracketHighlightColorNoMatch": "#FF0000",
+            "bracketHighlightBackgroundColorMatch": "--color-base-30",
+            "bracketHighlightBackgroundColorNoMatch": "--color-base-30",
+            "selectionMatchHighlightColor": "#99ff7780"
           },
           "header": {
             "backgroundColor": "--code-background",
@@ -104,6 +123,7 @@
       }
     },
     "Solarized": {
+      "baseTheme": "Solarized",
       "settings": {
         "codeblock": {
           "enableLineNumbers": true,
@@ -114,7 +134,12 @@
           "enableCopyCodeButton": false,
           "enableLinks": false,
           "enableLinkUpdate": false,
-          "textHighlight": true
+          "textHighlight": true,
+          "enableBracketHighlight": true,
+          "highlightNonMatchingBrackets": true,
+          "inverseFold": false,
+          "enableSelectionMatching": false,
+          "unwrapcode": false
         },
         "semiFold": {
           "enableSemiFold": false,
@@ -142,7 +167,8 @@
         },
         "printing": {
           "enablePrintToPDFStyling": false,
-          "forceCurrentColorUse": false
+          "forceCurrentColorUse": false,
+          "uncollapseDuringPrint": true
         },
         "common": {
           "enableInSourceMode": false
@@ -156,7 +182,13 @@
             "backgroundColor": "#002B36",
             "highlightColor": "#054b5c",
             "alternateHighlightColors": {},
-            "languageBorderColors": {}
+            "languageBorderColors": {},
+            "textColor": "#A30505",
+            "bracketHighlightColorMatch": "#36e920",
+            "bracketHighlightColorNoMatch": "#FF0000",
+            "bracketHighlightBackgroundColorMatch": "#073642",
+            "bracketHighlightBackgroundColorNoMatch": "#073642",
+            "selectionMatchHighlightColor": "#99ff7780"
           },
           "header": {
             "backgroundColor": "#0a4554",
@@ -183,7 +215,13 @@
             "backgroundColor": "#FCF6E4",
             "highlightColor": "#E9DFBA",
             "alternateHighlightColors": {},
-            "languageBorderColors": {}
+            "languageBorderColors": {},
+            "textColor": "#A30505",
+            "bracketHighlightColorMatch": "#ff01f7",
+            "bracketHighlightColorNoMatch": "#FF0000",
+            "bracketHighlightBackgroundColorMatch": "#EDE8D6",
+            "bracketHighlightBackgroundColorNoMatch": "#EDE8D6",
+            "selectionMatchHighlightColor": "#99ff7780"
           },
           "header": {
             "backgroundColor": "#D5CCB4",
@@ -209,6 +247,7 @@
   },
   "ExcludeLangs": "dataview, ad-*",
   "SelectedTheme": {
+    "baseTheme": "Obsidian",
     "settings": {
       "codeblock": {
         "enableLineNumbers": false,
@@ -219,7 +258,12 @@
         "enableCopyCodeButton": false,
         "enableLinks": false,
         "enableLinkUpdate": false,
-        "textHighlight": true
+        "textHighlight": true,
+        "enableBracketHighlight": true,
+        "highlightNonMatchingBrackets": true,
+        "inverseFold": false,
+        "enableSelectionMatching": false,
+        "unwrapcode": false
       },
       "semiFold": {
         "enableSemiFold": false,
@@ -247,7 +291,8 @@
       },
       "printing": {
         "enablePrintToPDFStyling": false,
-        "forceCurrentColorUse": false
+        "forceCurrentColorUse": false,
+        "uncollapseDuringPrint": true
       },
       "common": {
         "enableInSourceMode": true
@@ -261,7 +306,13 @@
           "backgroundColor": "--code-background",
           "highlightColor": "--text-highlight-bg",
           "alternateHighlightColors": {},
-          "languageBorderColors": {}
+          "languageBorderColors": {},
+          "textColor": "#A30505",
+          "bracketHighlightColorMatch": "#f33bff",
+          "bracketHighlightColorNoMatch": "#FF0000",
+          "bracketHighlightBackgroundColorMatch": "--color-base-30",
+          "bracketHighlightBackgroundColorNoMatch": "--color-base-30",
+          "selectionMatchHighlightColor": "#99ff7780"
         },
         "header": {
           "backgroundColor": "--code-background",
@@ -288,7 +339,13 @@
           "backgroundColor": "--code-background",
           "highlightColor": "--text-highlight-bg",
           "alternateHighlightColors": {},
-          "languageBorderColors": {}
+          "languageBorderColors": {},
+          "textColor": "#A30505",
+          "bracketHighlightColorMatch": "#f33bff",
+          "bracketHighlightColorNoMatch": "#FF0000",
+          "bracketHighlightBackgroundColorMatch": "--color-base-30",
+          "bracketHighlightBackgroundColorNoMatch": "--color-base-30",
+          "selectionMatchHighlightColor": "#99ff7780"
         },
         "header": {
           "backgroundColor": "--code-background",
