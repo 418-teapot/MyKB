@@ -274,7 +274,7 @@
         "boldText": false,
         "italicText": false,
         "collapseIconPosition": "hide",
-        "collapsedCodeText": "",
+        "collapsedCodeText": " ",
         "codeblockLangBoldText": true,
         "codeblockLangItalicText": true,
         "alwaysDisplayCodeblockLang": true,
