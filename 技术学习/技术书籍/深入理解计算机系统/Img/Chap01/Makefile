@@ -1,4 +1,4 @@
-objects = CompilationSystem.svg
+objects = CompilationSystem.svg HardwareOrganization.svg
 
 all: $(objects)
 

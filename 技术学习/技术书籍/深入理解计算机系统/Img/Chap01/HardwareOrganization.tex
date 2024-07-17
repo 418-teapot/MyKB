@@ -1,0 +1,86 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{ctex}
+
+\usetikzlibrary{
+    arrows,
+    arrows.meta,
+    calc,
+    graphs,
+    positioning,
+    quotes,
+    shapes,
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+    \tikzset{
+        unit/.style = {
+            draw,
+            inner sep = 0.2em,
+            minimum height = 4em,
+            text width = 6em,
+            text centered,
+        }
+    }
+    \tikzset{
+        bus/.style = {
+            > = {
+                Triangle[length = 3mm, width = 6mm]
+            },
+            line width = 3mm,
+            draw = white!10!lightgray,
+        }
+    }
+
+    \node [unit] (interface) {总线接口};
+    \node [draw, minimum height = 5em, minimum width = 4em, above = 2.5em of interface] (reg) {};
+    \node [above = 0em of reg] {寄存器堆};
+    \node [draw, minimum height = 5em, right = 3em of reg] (alu) {ALU};
+    \node [draw, minimum width = 3em, left = 1em of reg] (pc) {PC};
+    \foreach \i in {1, 2, ..., 4} {
+        \draw ($(reg.north west)!\i/5!(reg.south west)$) --
+              ($(reg.north east)!\i/5!(reg.south east)$);
+    }
+
+    \coordinate (cpu0) at ($(interface.south west)!(pc.south west)!(interface.south east) + (-0.5em, -0.5em)$);
+    \coordinate (cpu1) at ($(alu.north east) + (0.5em, 1.5em)$);
+    \draw (cpu0) rectangle (cpu1);
+    \node [above right] at (cpu0 |- cpu1) {CPU};
+
+    \node [unit, right = 12em of interface] (bridge) {I/O 桥};
+    \node [unit, right = 12em of bridge] (memory) {内存};
+    \node [unit, below = 6em of interface] (usb) {USB 控制器};
+    \node [unit, right = 6em of usb] (graph) {图形适配器};
+    \node [unit, right = 6em of graph] (diskc) {磁盘控制器};
+    \node [below = 3em of graph] (display) {显示器};
+    \node [below = 3em of usb.225] (mouse) {鼠标};
+    \node [below = 3em of usb.315] (keyboard) {键盘};
+    \node [draw, shape = cylinder, shape border rotate = 90, below = 3em of diskc, minimum width = 4em, aspect = 0.3] (disk) {磁盘};
+
+    \draw [->] (graph) -- (display);
+    \draw [->] (mouse) -- (usb.225);
+    \draw [->] (keyboard) -- (usb.315);
+    \draw [<->] (diskc) -- (disk);
+
+    \draw [bus, <->] (interface) -- (reg);
+    \draw [bus, ->] (reg.35) -> ($(alu.north west)!(reg.35)!(alu.south west)$);
+    \draw [bus, <-] (reg.325) -> ($(alu.north west)!(reg.325)!(alu.south west)$);
+    \draw [bus, <->] (interface) -- node[above]{系统总线} (bridge);
+    \draw [bus, <->] (bridge) -- node[above]{访存总线} (memory);
+    \coordinate (A) at ($(interface.south west) + (0, -3em)$);
+    \coordinate (B) at ($(memory.south east) + (0, -3em)$);
+    \draw (A) [bus, <->] -- (B);
+    \draw [bus, ->] ($(A)!(bridge.south)!(B)$) node[below]{I/O 总线} -- (bridge.south);
+    \draw [bus, ->] ($(A)!(usb.north)!(B)$) -- (usb.north);
+    \draw [bus, ->] ($(A)!(graph.north)!(B)$) -- (graph.north);
+    \draw [bus, ->] ($(A)!(diskc.north)!(B)$) -- (diskc.north);
+
+    \node [draw, minimum width = 1em, minimum height = 3em, left = 3em] (slot0) at (B) {};
+    \node [draw, minimum width = 1em, minimum height = 3em, left = 0.5em of slot0] (slot1) {};
+    \node [draw, minimum width = 1em, minimum height = 3em, left = 0.5em of slot1] (slot2) {};
+    \node [text width = 8em, below = 0em of slot0] {\small{其他设备的扩展槽，例如网络适配器}};
+\end{tikzpicture}
+
+\end{document}
