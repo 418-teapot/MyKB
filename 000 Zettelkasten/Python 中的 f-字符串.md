@@ -2,6 +2,7 @@
 style: manual
 tags:
   - Python
+  - 字符串
 ---
 
 # 简介
@@ -197,3 +198,7 @@ f- 字符串采用 `{content:format}` 设置字符串格式，其中 `content` �
 | `g`        | 通用格式，小数使用 `f`，大数使用 `e`                 | 浮点数、复数、整数（自动转换为浮点数） |
 | `G`        | 通用格式，小数使用 `F`，大数使用 `E`                 | 浮点数、复数、整数（自动转换为浮点数） |
 | `%`        | 百分比格式，按 `f` 格式排版，并加上 `%` 后缀         | 浮点数、整数（自动转换为浮点数）       |
+
+# 引用
+
+- [f-strings](https://docs.python.org/3/reference/lexical_analysis.html#formatted-string-literals)
