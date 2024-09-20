@@ -1,0 +1,61 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{ctex}
+
+\usetikzlibrary{
+    arrows,
+    arrows.meta,
+    calc,
+    graphs,
+    math,
+    positioning,
+    quotes,
+    shapes,
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+    \tikzset{
+        triangle/.style = {
+            draw,
+            isosceles triangle,
+            isosceles triangle stretches,
+            shape border rotate = 90,
+            anchor = north,
+        }
+    }
+    \tikzset{
+        literal/.style = {
+            midway,
+            above = 0.5em,
+            text centered,
+        }
+    }
+
+    \def\memory{
+        寄存器,
+        L1 cache(SRAM),
+        L2 cache(SRAM),
+        L3 cache(SRAM),
+        主存(DRAM),
+        本地存储(本地磁盘),
+        远程存储(分布式文件系统，网络服务器)
+    }
+
+    \foreach \l [count=\i] in \memory {
+        \node [triangle, minimum width = \i * 1.8 cm, minimum height = \i * 1.8 cm] (L\i) {};
+        \draw (L\i.left corner) -- (L\i.right corner) node[literal] {\l};
+        \tikzmath{
+            int \j, \i;
+            \j = \i - 1;
+        }
+        \draw (L\i.left corner) node[left = 2em, above = 1.5em] {L\j:};
+    }
+    \coordinate (mid) at ($(L7.left corner)!1/2!(L7.north)$);
+    \coordinate (start) at ($(L7.left corner)!(mid)!(L7.left corner) + (-2em, 0)$);
+    \draw [thick, -latex] ($(start) + (0, 1em)$) -- node[left, text width = 5em] {更小、更快、更贵的存储设备} (start |- L7.north);
+    \draw [thick, -latex] ($(start) - (0, 1em)$) -- node[left, text width = 5em] {更大、更慢、更便宜的存储设备} (start |- L7.left corner);
+\end{tikzpicture}
+
+\end{document}
