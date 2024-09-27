@@ -1,0 +1,35 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{ctex}
+
+\usetikzlibrary{
+    calc,
+    decorations.pathreplacing,
+    positioning,
+    shapes,
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+    \node [draw, rectangle split, rectangle split parts = 3,
+           rectangle split empty part height = 1em, minimum width = 24em] (A)
+           {应用程序\nodepart{two}操作系统};
+
+    \coordinate (M1) at ($(A.two split west)!1/3!(A.two split east)$);
+    \coordinate (M2) at ($(A.two split west)!2/3!(A.two split east)$);
+    \coordinate (N1) at ($(A.south west)!1/3!(A.south east)$);
+    \coordinate (N2) at ($(A.south west)!2/3!(A.south east)$);
+    \path (A.two split west) rectangle node {处理器} (N1);
+    \path (M1) rectangle node {主存} (N2);
+    \path (M2) rectangle node {I/O 设备} (A.south east);
+    \draw (M1) -- (N1);
+    \draw (M2) -- (N2);
+
+    \draw [decorate, decoration = {brace, raise = 5pt}]
+          (A.north east) -- node [right = 5pt] {软件} (A.two split east);
+    \draw [decorate, decoration = {brace, raise = 5pt}]
+          (A.two split east) -- node [right = 5pt] {硬件} (A.south east);
+\end{tikzpicture}
+
+\end{document}
