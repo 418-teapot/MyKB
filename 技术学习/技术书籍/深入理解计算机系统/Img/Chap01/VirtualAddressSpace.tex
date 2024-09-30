@@ -1,0 +1,54 @@
+\documentclass[]{standalone}
+
+\usepackage{color}
+\usepackage[usenames, dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{ctex}
+
+\usetikzlibrary{
+    calc,
+    decorations.pathreplacing,
+    math,
+    positioning,
+    shapes,
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+    \node [draw, rectangle split, rectangle split parts = 9, align = center,
+           rectangle split empty part height = 1.5em,
+           rectangle split part fill = {
+               lightgray!70!white,
+               lightgray!70!white,
+               ProcessBlue!40!white,
+               lightgray!70!white,
+               ProcessBlue!40!white,
+               lightgray!70!white,
+               lightgray!70!white,
+               lightgray!70!white,
+               ProcessBlue!40!white},
+           minimum width = 12em] (A)
+          {内核虚拟内存
+           \nodepart{two}用户栈\\（运行时创建）
+           \nodepart{three}
+           \nodepart{four}共享库的内存\\映射区域
+           \nodepart{five}
+           \nodepart{six}运行时堆\\（\texttt{malloc}创建）
+           \nodepart{seven}读/写内存
+           \nodepart{eight}只读代码与数据
+           \nodepart{nine}};
+    \draw [-latex] (A.two split) -- ++(0, -0.8em);
+    \draw [-latex] (A.three split) -- ++(0, 0.8em);
+    \draw [-latex] (A.five split) -- ++(0, 1em);
+
+    \node [left = 0 of A.south west] {0};
+    \draw [latex-] (A.eight split west) -- ++(-2em, 0) node [left] {\small{程序起始}};
+
+    \draw [-latex] ($(A.text split east) + (0.5em, 0)$) -- node [right] {\small{用户代码不可见的内存}} ($(A.north east) + (0.5em, 0)$);
+    \node [right = 0.5em of A.four east] {\small{\texttt{printf}函数}};
+    \draw [decorate, decoration = {brace, raise = 0.5em}]
+          (A.six split east) -- node [right = 0.5em] {\small{加载自\texttt{hello}可执行文件}} (A.eight split east);
+\end{tikzpicture}
+
+\end{document}

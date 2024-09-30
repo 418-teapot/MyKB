@@ -1,5 +1,5 @@
 objects = CompilationSystem.svg HardwareOrganization.svg MemoryHierarchy.svg \
-          LayeredViewOfComputer.svg AbstractionsOfOS.svg
+          LayeredViewOfComputer.svg AbstractionsOfOS.svg VirtualAddressSpace.svg
 
 all: $(objects)
 
