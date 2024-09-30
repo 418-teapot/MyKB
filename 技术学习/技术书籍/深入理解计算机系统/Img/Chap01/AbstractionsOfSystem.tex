@@ -1,0 +1,42 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{ctex}
+
+\usetikzlibrary{
+    calc,
+    decorations.pathreplacing,
+    math,
+    positioning,
+    shapes,
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+    \node [draw, rectangle split, rectangle split parts = 4, align = center,
+           rectangle split horizontal = true, text width = 8em] (A)
+           {操作系统\nodepart{two}处理器\nodepart{three}主存\nodepart{four}I/O 设备};
+
+    \def\abstractions{
+        (A.three split north)/文件,
+        (A.two split north)/虚拟内存,
+        (A.one split north)/进程,
+        (A.north west)/虚拟机
+    }
+
+    \foreach \p/\a [count = \i from 0] in \abstractions {
+        \tikzmath{
+            int \j, \i;
+            \j = \i * 25 + 10;
+        }
+        \draw [decorate, decoration = {brace, raise = \j pt}]
+              \p -- node [above = \j pt] {\a} (A.north east);
+        \draw [dashed] \p -- ++(0, \j pt);
+    }
+    \draw [decorate, decoration = {brace, raise = 35pt}]
+          (A.one split north) -- node [above = 35pt] {指令集架构} (A.two split north);
+    \draw [dashed] (A.north east) -- ++(0, 85pt);
+
+\end{tikzpicture}
+
+\end{document}
