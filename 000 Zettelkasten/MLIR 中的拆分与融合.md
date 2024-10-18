@@ -58,16 +58,14 @@ scf.for %arg2 = %c0 to %c1024 step %c1 {
 }
 ```
 
-## 循环优化
+## 循环拆分/算子拆分
 
-我们可以从循环的角度来观察 Linalg op 的拆分与融合。
+### parallel 轴的拆分
 
-### 循环拆分
-
-以向量加法为例：$A = B + C$，其中 $A$、$B$、$C$ 均为长度为 $L$ 的向量，那么该向量加法可以表示为：
+以向量加法为例：$A = B + C$，其中 $A$、$B$、$C$ 均为长度为 1024 的向量，那么该向量加法可以表示为：
 
 ```cpp
-for (int i = 0; i < L; ++i) {
+for (int i = 0; i < 1024; ++i) {
   A[i] = B[i] + C[i];
 }
 ```
@@ -75,62 +73,150 @@ for (int i = 0; i < L; ++i) {
 这等价于 Linalg op 上向量的加法：
 
 ```llvm
-%1 = linalg.add ins(%arg0, %arg1 : tensor<Lxf32>, tensor<Lxf32>) outs(%0 : tensor<Lxf32>) -> tensor<Lxf32>
+%1 = linalg.add ins(%arg0, %arg1 : tensor<1024xf32>, tensor<1024xf32>) outs(%0 : tensor<1024xf32>) -> tensor<1024xf32>
 ```
 
-该循环的迭代变量是 $i$，总共执行了 $L$ 次，如果我们对 $L$ 进行拆分：
+该循环的迭代变量是 $i$，总共执行了 1024 次，如果我们对这个向量在长度拆分 4 次：
 
 ```cpp
-for (int i = 0; i < (L/K); ++i) {
-  for (int j = 0; j < K; ++j) {
-    A[i * K + j] = B[i * K + j] + C[i * K + j];
+for (int i = 0; i < 4; ++i) {
+  for (int j = 0; j < 256; ++j) {
+    A[i * 256 + j] = B[i * 256 + j] + C[i * 256 + j];
   }
 }
 ```
 
-其中最内层循环可以看成是长度为 $K$ 的 Linalg 上的向量加法：
+其中最内层循环可以看成是长度为 256 的向量加法，但是这样面临着一个问题：上述的拆分都将 `tensor` 考虑为了一个数组，这样的考虑对 `memref` 是可行的，因为 `memref` 允许对部分分块的读写；但对 `tensor` 来说分块语义就不再明确了，因为 `tensor` 在语义上是不可分的整体，是不支持部分读写的，哪怕是一个元素的改动也会产生一个全新的和原 `tensor` 具有相同 shape 的 `tensor`。为了解决这一问题，社区引入了 `tensor.extract_slice` 和 `tensor.insert_slice` 算子。
+
+有了这些算子，我们就可以将上述对循环的拆分映射到对 Linalg op 的拆分，社区提供了 `transform.structured.tile_using_forall` 和 `transform.structured.tile_using_for` 来对 op 进行拆分：
 
 ```llvm
-scf.for %arg2 = %c0 to L/K step %c1 {
-  %slice0 = tensor.extract_slice %arg0[%arg2 * K] [K] ...
-  %slice1 = tensor.extract_slice %arg1[%arg2 * K] [K] ...
-  %1 = linalg.add ins(%slice0, %slice1 : tensor<Kxf32>, tensor<Kxf32>) outs(%tmp : tensor<Kxf32>) ...
-  tensor.insert_slice %tmp into %0
+func.func @add(%arg0 : tensor<1024xf32>, %arg1 : tensor<1024xf32>) -> tensor<1024xf32> {
+ %0 = tensor.empty() : tensor<1024xf32>
+ %1 = linalg.add ins(%arg0, %arg1 : tensor<1024xf32>, tensor<1024xf32>) outs(%0 : tensor<1024xf32>) -> tensor<1024xf32>
+ return %1 : tensor<1024xf32>
+}
+
+transform.with_pdl_patterns {
+^bb0(%arg0: !pdl.operation):
+ transform.sequence %arg0 : !pdl.operation failures(propagate) {
+   ^bb0(%arg1: !pdl.operation):
+     %func = transform.structured.match ops{["func.func"]} in %arg1 : (!pdl.operation) -> !pdl.operation
+     %add = transform.structured.match ops{["linalg.add"]} in %func : (!pdl.operation) -> !pdl.operation
+     %forall_op, %tiled_op = transform.structured.tile_using_forall %add num_threads [4] : (!pdl.operation) -> (!pdl.operation, !pdl.operation)
+ }
 }
 ```
 
-### 循环融合
+`transform.structured.tile_using_forall` 需要提供 `num_threads` 或 `tile_sizes` 来指示拆分块的大小，其中 `num_threads` 是控制拆分后外层循环的迭代次数，`tile_sizes` 是控制拆分后向量的长度；还有一个可选的参数 `mapping`，用来控制循环迭代变量映射到的轴。
 
-我们有向量加法 $A = B + C$ 和向量乘法 $D = A * E$，其中 $A$、$B$、$C$、$D$、$E$ 均为长度为 $L$ 的向量，我们在数学层面上可以很容易地写出这等价于 $D = (B + C) * E$，对应到循环上就是：
+```llvm
+#map = affine_map<(d0) -> (d0 * 256)>
+func.func @add(%arg0: tensor<1024xf32>, %arg1: tensor<1024xf32>) -> tensor<1024xf32> {
+  %0 = tensor.empty() : tensor<1024xf32>
+  %c4 = arith.constant 4 : index
+  %1 = scf.forall (%arg2) in (4) shared_outs(%arg3 = %0) -> (tensor<1024xf32>) {
+    %2 = affine.apply #map(%arg2)
+    %3 = affine.apply #map(%arg2)
+    %4 = affine.apply #map(%arg2)
+    %5 = affine.apply #map(%arg2)
+    %extracted_slice = tensor.extract_slice %arg0[%3] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %extracted_slice_0 = tensor.extract_slice %arg1[%4] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %extracted_slice_1 = tensor.extract_slice %arg3[%5] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %6 = linalg.add ins(%extracted_slice, %extracted_slice_0 : tensor<256xf32>, tensor<256xf32>) outs(%extracted_slice_1 : tensor<256xf32>) -> tensor<256xf32>
+    %7 = affine.apply #map(%arg2)
+    scf.forall.in_parallel {
+      tensor.parallel_insert_slice %6 into %arg3[%7] [256] [1] : tensor<256xf32> into tensor<1024xf32>
+    }
+  }
+  return %1 : tensor<1024xf32>
+}
+```
+
+`transform.structured.tile_using_for` 只能通过 `tile_sizes` 来控制，而且没有 `mapping`。
+
+```llvm
+func.func @add(%arg0: tensor<1024xf32>, %arg1: tensor<1024xf32>) -> tensor<1024xf32> {
+  %0 = tensor.empty() : tensor<1024xf32>
+  %c0 = arith.constant 0 : index
+  %c1024 = arith.constant 1024 : index
+  %c256 = arith.constant 256 : index
+  %1 = scf.for %arg2 = %c0 to %c1024 step %c256 iter_args(%arg3 = %0) -> (tensor<1024xf32>) {
+    %extracted_slice = tensor.extract_slice %arg0[%arg2] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %extracted_slice_0 = tensor.extract_slice %arg1[%arg2] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %extracted_slice_1 = tensor.extract_slice %arg3[%arg2] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %2 = linalg.add ins(%extracted_slice, %extracted_slice_0 : tensor<256xf32>, tensor<256xf32>) outs(%extracted_slice_1 : tensor<256xf32>) -> tensor<256xf32>
+    %inserted_slice = tensor.insert_slice %2 into %arg3[%arg2] [256] [1] : tensor<256xf32> into tensor<1024xf32>
+    scf.yield %inserted_slice : tensor<1024xf32>
+  }
+  return %1 : tensor<1024xf32>
+}
+```
+
+上面两个 transform op 的实现较为简单，主体方法就是首先创建 `scf.forall` 或 `scf.for` op，然后根据给定的 `num_threads` 或 `tile_sizes` 计算每次迭代的偏移和大小，然后传给 `TilingInterface` 的实现拿到拆分后的结果，最后创建 `insert_slice`。
+
+### reduction 轴的拆分
+
+上面的结果只有在拆分的轴是 `parallel` 的情况下才是正确的，考虑向量归约计算：$a = sum(A)$，其中 $A$ 是长度为 1024 的向量，那么该向量归约可以表示为：
 
 ```cpp
-for (int i = 0; i < L; ++i) {
-  A[i] = B[i] + C[i];
-}
-
-for (int i = 0; i < L; ++i) {
-  D[i] = A[i] * E[i];
+for (int i = 0; i < 1024; ++i) {
+  a += A[i];
 }
 ```
 
-到：
+如果我们对向量在长度上拆分 4 次：
 
 ```cpp
-for (int i = 0; i < L; ++i) {
-  A[i] = B[i] + C[i];
-  D[i] = A[i] * E[i];
+for (int i = 0; i < 4; ++i) {
+  for (int j = 0; j < 256; ++j) {
+    a += A[i * 256 + j] 
+  }
 }
 ```
 
-再到：
+这在循环上的拆分是显而易见的，但如果我们对 Linalg op 直接调用 `transform.structured.tile_using_forall`：
 
-```cpp
-for (int i = 0; i < L; ++i) {
-  D[i] = (B[i] + C[i]) * E[i];
+```llvm
+func.func @sum(%arg0 : tensor<1024xf32>) -> tensor<f32> {
+ %0 = tensor.empty() : tensor<f32>
+ %1 = linalg.reduce { arith.addf } ins(%arg0 : tensor<1024xf32>) outs(%0 : tensor<f32>) dimensions = [0]
+ return %1 : tensor<f32>
+}
+
+transform.with_pdl_patterns {
+^bb0(%arg0: !pdl.operation):
+ transform.sequence %arg0 : !pdl.operation failures(propagate) {
+   ^bb0(%arg1: !pdl.operation):
+     %func = transform.structured.match ops{["func.func"]} in %arg1 : (!pdl.operation) -> !pdl.operation
+     %reduce = transform.structured.match ops{["linalg.reduce"]} in %func : (!pdl.operation) -> !pdl.operation
+     %result:2 = transform.structured.tile_using_forall %reduce num_threads [4] : (!pdl.operation) -> (!pdl.operation, !pdl.operation)
+ }
 }
 ```
 
-### 其他优化手段
+会得到：
+
+```llvm
+#map = affine_map<(d0) -> (d0 * 256)>
+func.func @sum(%arg0: tensor<1024xf32>) -> tensor<f32> {
+  %0 = tensor.empty() : tensor<f32>
+  %c4 = arith.constant 4 : index
+  %1 = scf.forall (%arg1) in (4) shared_outs(%arg2 = %0) -> (tensor<f32>) {
+    %2 = affine.apply #map(%arg1)
+    %3 = affine.apply #map(%arg1)
+    %extracted_slice = tensor.extract_slice %arg0[%3] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %extracted_slice_0 = tensor.extract_slice %arg2[] [] [] : tensor<f32> to tensor<f32>
+    %reduced = linalg.reduce { arith.addf } ins(%extracted_slice : tensor<256xf32>) outs(%extracted_slice_0 : tensor<f32>) dimensions = [0]
+    scf.forall.in_parallel {
+      tensor.parallel_insert_slice %reduced into %arg2[] [] [] : tensor<f32> into tensor<f32>
+    }
+  }
+  return %1 : tensor<f32>
+}
+```
+
+同时会报出 `warning: tiling is not thread safe at axis #0`。
 
 ---
 
