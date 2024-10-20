@@ -92,9 +92,9 @@ for (int i = 0; i < 4; ++i) {
 
 ```llvm
 func.func @add(%arg0 : tensor<1024xf32>, %arg1 : tensor<1024xf32>) -> tensor<1024xf32> {
- %0 = tensor.empty() : tensor<1024xf32>
- %1 = linalg.add ins(%arg0, %arg1 : tensor<1024xf32>, tensor<1024xf32>) outs(%0 : tensor<1024xf32>) -> tensor<1024xf32>
- return %1 : tensor<1024xf32>
+  %0 = tensor.empty() : tensor<1024xf32>
+  %1 = linalg.add ins(%arg0, %arg1 : tensor<1024xf32>, tensor<1024xf32>) outs(%0 : tensor<1024xf32>) -> tensor<1024xf32>
+  return %1 : tensor<1024xf32>
 }
 
 transform.with_pdl_patterns {
@@ -179,9 +179,9 @@ for (int i = 0; i < 4; ++i) {
 
 ```llvm
 func.func @sum(%arg0 : tensor<1024xf32>) -> tensor<f32> {
- %0 = tensor.empty() : tensor<f32>
- %1 = linalg.reduce { arith.addf } ins(%arg0 : tensor<1024xf32>) outs(%0 : tensor<f32>) dimensions = [0]
- return %1 : tensor<f32>
+  %0 = tensor.empty() : tensor<f32>
+  %1 = linalg.reduce { arith.addf } ins(%arg0 : tensor<1024xf32>) outs(%0 : tensor<f32>) dimensions = [0]
+  return %1 : tensor<f32>
 }
 
 transform.with_pdl_patterns {
@@ -216,7 +216,37 @@ func.func @sum(%arg0: tensor<1024xf32>) -> tensor<f32> {
 }
 ```
 
-同时会报出 `warning: tiling is not thread safe at axis #0`。
+同时会报出 `warning: tiling is not thread safe at axis #0`。我们可以看到 `tile_use_forall` 只是单纯地将算子拆分成了 4 份，并没有将这 4 份结果最后再累加起来。
+
+为了正确地拆分 reduction 轴，我们应当使用 `transform.structured.tile_reduction_using_forall` 和 `transform.structured.tile_reduction_using_for`
+
+```llvm
+#map = affine_map<(d0) -> (d0 * 256)>
+func.func @sum(%arg0: tensor<1024xf32>) -> tensor<f32> {
+  %0 = tensor.empty() : tensor<f32>
+  %1 = tensor.empty() : tensor<4xf32>
+  %cst = arith.constant 0.000000e+00 : f32
+  %2 = linalg.fill ins(%cst : f32) outs(%1 : tensor<4xf32>) -> tensor<4xf32>
+  %c4 = arith.constant 4 : index
+  %3 = scf.forall (%arg1) in (4) shared_outs(%arg2 = %2) -> (tensor<4xf32>) {
+    %4 = affine.apply #map(%arg1)
+    %extracted_slice = tensor.extract_slice %arg2[%arg1] [1] [1] : tensor<4xf32> to tensor<f32>
+    %5 = affine.apply #map(%arg1)
+    %extracted_slice_0 = tensor.extract_slice %arg0[%5] [256] [1] : tensor<1024xf32> to tensor<256xf32>
+    %extracted_slice_1 = tensor.extract_slice %extracted_slice[] [] [] : tensor<f32> to tensor<f32>
+    %reduced_2 = linalg.reduce { arith.addf } ins(%extracted_slice_0 : tensor<256xf32>) outs(%extracted_slice_1 : tensor<f32>) dimensions = [0]
+    scf.forall.in_parallel {
+      tensor.parallel_insert_slice %reduced_2 into %arg2[%arg1] [1] [1] : tensor<f32> into tensor<4xf32>
+    }
+  }
+  %reduced = linalg.reduce ins(%3 : tensor<4xf32>) outs(%0 : tensor<f32>) dimensions = [0]
+    (%in: f32, %init: f32) {
+      %4 = arith.addf %in, %init : f32
+      linalg.yield %4 : f32
+    }
+```
+
+使用 `tile_reduction_using_forall` 之后，在拆分时会将每份的结果先到一个 `tensor` 中，然后再对这个 `tensor` 进行累加操作。
 
 ---
 
