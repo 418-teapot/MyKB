@@ -19,21 +19,33 @@ Linalg op 即可以接受 tensor 又可以接受 memref。总体上有两类 Lin
 结构化的 op 包括 `linalg.generic`、`linalg.map`、`linalg.reduce`、`linalg.transpose`、`linalg.broadcast`、`linalg.matmul`、`linalg.conv` 等。其中 `linalg.generic` 是最核心的 op；其他 op 被称为 named ops，这些 op 只是某些特定的 `linalg.generic` 的语法糖。例如：
 
 ```llvm
-%1 = linalg.add ins(%arg0, %arg1 : tensor<1024xf32>, tensor<1024xf32>) outs(%0 : tensor<1024xf32>) -> tensor<1024xf32>
+module {
+  func.func @matmul(%arg0: tensor<128x256xf32>, %arg1: tensor<256x512xf32>) -> tensor<128x512xf32> {
+    %0 = tensor.empty() : tensor<128x512xf32>
+    %1 = linalg.matmul ins(%arg0, %arg1 : tensor<128x256xf32>, tensor<256x512xf32>) outs(%0 : tensor<128x512xf32>) -> tensor<128x512xf32>
+    return %1 : tensor<128x512xf32>
+  }
+}
 ```
 
 使用 `--linalg-generalize-named-ops` pass 可以将 named ops 还原为 `linalg.generic`：
 
 ```llvm
-#map = affine_map<(d0) -> (d0)>
-
-%1 = linalg.generic {indexing_maps = [#map, #map, #map], iterator_types = ["parallel"]}
-  ins(%arg0, %arg1 : tensor<1024xf32>, tensor<1024xf32>)
-   outs(%0 : tensor<1024xf32>) {
-   ^bb0(%in: f32, %in_0: f32, %out: f32):
-     %2 = arith.addf %in, %in_0 : f32
-     linalg.yield %2 : f32  
-} -> tensor<1024xf32>
+#map = affine_map<(d0, d1, d2) -> (d0, d2)>
+#map1 = affine_map<(d0, d1, d2) -> (d2, d1)>
+#map2 = affine_map<(d0, d1, d2) -> (d0, d1)>
+module {
+  func.func @matmul(%arg0: tensor<128x256xf32>, %arg1: tensor<256x512xf32>) -> tensor<128x512xf32> {
+    %0 = tensor.empty() : tensor<128x512xf32>
+    %1 = linalg.generic {indexing_maps = [#map, #map1, #map2], iterator_types = ["parallel", "parallel", "reduction"]} ins(%arg0, %arg1 : tensor<128x256xf32>, tensor<256x512xf32>) outs(%0 : tensor<128x512xf32>) {
+    ^bb0(%in: f32, %in_0: f32, %out: f32):
+      %2 = arith.mulf %in, %in_0 : f32
+      %3 = arith.addf %out, %2 : f32
+      linalg.yield %3 : f32
+    } -> tensor<128x512xf32>
+    return %1 : tensor<128x512xf32>
+  }
+}
 ```
 
 结构化的 Linalg op 都实现了 `LinalgOp Interface`，并具有统一的 IR 结构：
@@ -298,6 +310,71 @@ for (int i = 0; i < 1024; ++i) {
 
 ### 循环融合
 
+以上面的向量乘法和向量加法为例，如果我们先对向量加法进行了拆分：
+
+```llvm
+%mul = linalg.map {arith.mulf} ins(%0, %1 : tensor<1024xf32>, tensor<1024xf32>) outs(%2 : tensor<1024xf32>)
+%loop = scf.forall (%arg1) in %c4 {
+  %mul' = tensor.extract_slice %mul ...
+  %e' = tensor.extract_slice %E ...
+  %add' = linalg.map {arith.addf} ins(%mul', %e' : tensor<256xf32>, tensor<256xf32>) outs ...
+}
+```
+
+通过观察，不难发现，我们可以对 `linalg.map {arith.mulf}` 进行相同的拆分，然后将两个循环合并到一起：
+
+```llvm
+%loop = scf.forall (%arg1) in %c4 {
+  %a' = tensor.extract_slice %A ...
+  %b' = tensor.extract_slice %B ...
+  %e' = tensor.extract_slice %E ...
+  %mul' = linalg.map {arith.mulf} ins(%a', %b') ...
+  %add' = linalg.map {arith.addf} ins(%mul', %e') ...
+}
+```
+
+Linalg Dialect 提供了 `transform.structured.fuse_into_containing` 来将 producer 融入到拆分后的 consumer 循环中，该 op 在实现上分为几个步骤：
+
+1. 统计 producer 在循环中有多少个 user；
+2. 在 user 中找到第一个 `tensor.extract_slice`；
+3. 根据 `tensor.extract_slice` 的 size 和 offset 等信息，调用 producer 的 tiling interface 实现，在循环中创建拆分后的 op；
+4. 如果有非 `tensor.extract_slice` 的 user，将 producer 直接 clone 到循环中；
+5. 重复第 2 步，直到 user 计数为 0。
+
+使用 `transform.structured.fuse_into_containing` 时，我们需要先对一个 op 进行拆分，然后不断地 match 其他 op，将其融合到循环中，使用起来较为麻烦。
+
+针对这一场景，genesis 添加了 `fuse_greedily` 这一 trasform op，该 op 可以在对一个 op 进行拆分的同时，将其 producer 链上的所有 op 融合到循环中。
+
+```
+
+  A
+ / \
+B   C
+ \ /
+  D
+```
+
+例如该情况下，在我们锚定 `D` 的时候，`fuse_greedily` 会进行广度优先搜索，将 `B` 和 `C` 添加到队列中；在融合 `B` 之后，会将其 producer `A` 添加到队列中；在融合 `C` 之后，由于 `B` 和 `C` 都依赖于 `A`，因此在循环中会有 2 个 `A` 的 `tensor.extract_slice`，所以在融合 `A` 后循环中会有 2 个 `A`；`fuse_greedily` 最后会调用一次 CSE 和 canonicalization，当这两个 `A` 的拆分是一致的时候，其中一个 `A` 会被消除。
+
+将 producer 融入到 consumer 对于一个 consumer 对应多个 producer 是有利的：
+
+```
+A   B
+ \ /
+  C
+```
+
+但对一个 producer 对应多个 consumer 的情况是不利的：
+
+```
+
+  A
+ / \
+B   C
+```
+
+针对这种情况，genesis 添加了将 consumer 融合到 producer 的方法。
+
 ## 标准化
 
 在循环拆分的时候我们已经知道，“对多个轴同时进行拆分，相当于对每个轴分别进行拆分”。
@@ -324,9 +401,9 @@ for (int i = 0; i < 2; ++i) {
 ```llvm
 %0 = scf.forall (%arg1) in (%c2) {
   %1 = scf.forall (%arg2) in (%c4) {
-    a' = tensor.extract_slice A ...
-    b' = tensor.extract_slice B ...
-    c' = linalg.add ins(a', b' : tensor<128x256xf32>, tensor<128x256xf32>)
+    %a' = tensor.extract_slice %A ...
+    %b' = tensor.extract_slice %B ...
+    %c' = linalg.add ins(%a', %b' : tensor<128x256xf32>, tensor<128x256xf32>)
   }
 }
 ```
@@ -336,9 +413,9 @@ for (int i = 0; i < 2; ++i) {
 ```llvm
 %1 = scf.forall (%arg2) in (%c4) {
   %0 = scf.forall (%arg1) in (%c2) {
-    a' = tensor.extract_slice A ...
-    b' = tensor.extract_slice B ...
-    c' = linalg.add ins(a', b' : tensor<128x256xf32>, tensor<128x256xf32>)
+    %a' = tensor.extract_slice %A ...
+    %b' = tensor.extract_slice %B ...
+    %c' = linalg.add ins(%a', %b' : tensor<128x256xf32>, tensor<128x256xf32>)
   }
 }
 ```
@@ -357,9 +434,9 @@ for (int i = 0; i < 2; ++i) {
 ```llvm
 %0 = scf.forall (%arg1) in (%c2) {
   %1 = scf.forall (%arg2) in (%c4) {
-    a' = tensor.extract_slice A ...
-    b' = tensor.extract_slice B ...
-    c' = linalg.add ins(a', b' : tensor<128x256xf32>, tensor<128x256xf32>)
+    %a' = tensor.extract_slice %A ...
+    %b' = tensor.extract_slice %B ...
+    %c' = linalg.add ins(%a', %b' : tensor<128x256xf32>, tensor<128x256xf32>)
   }
 }
 ```
@@ -377,9 +454,9 @@ for (int i = 0; i < 2; ++i) {
 ```llvm
 %0 = scf.forall (%arg1) in %c2 {
   %1 = scf.forall (%arg2) in %c4 {
-    a' = tensor.extract_slice A ...
-    b' = tensor.extract_slice B ...
-    c' = linalg.add ins(a', b' : tensor<256x128xf32>)
+    %a' = tensor.extract_slice %A ...
+    %b' = tensor.extract_slice %B ...
+    %c' = linalg.add ins(%a', %b' : tensor<256x128xf32>)
   }
 }
 ```
