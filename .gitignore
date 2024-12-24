@@ -9,3 +9,5 @@
 **/*.svg
 **/*.xdv
 
+# MacOs
+.DS_Store
