@@ -15,12 +15,12 @@ def get_makefiles() -> list[str]:
 
 def make(paths: list[str]):
     for path in paths:
-        os.system("make -C {}".format(path))
+        os.system("make -C \'{}\'".format(path))
 
 
 def clean(paths: list[str]):
     for path in paths:
-        os.system("make -C {} clean".format(path))
+        os.system("make -C \'{}\' clean".format(path))
 
 
 if __name__ == '__main__':
