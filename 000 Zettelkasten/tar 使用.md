@@ -2,7 +2,7 @@
 style: manual
 tags:
   - 工具
-  - tar
+  - 压缩
 ---
 
 # 正文

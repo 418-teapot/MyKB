@@ -1,7 +1,8 @@
 ---
 style: manual
 tags:
-  - GDB
+  - 工具
+  - 调试
 ---
 
 # 正文
