@@ -15,19 +15,19 @@ def get_makefiles() -> list[str]:
 
 def make(paths: list[str]):
     for path in paths:
-        os.system("make -C \'{}\'".format(path))
+        os.system(f"make -C '{path}'")
 
 
 def clean(paths: list[str]):
     for path in paths:
-        os.system("make -C \'{}\' clean".format(path))
+        os.system(f"make -C '{path}' clean")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Execute make for all subdir.")
-    parser.add_argument('--clean',
-                        help='execute make clean',
+    parser.add_argument("--clean",
+                        help="execute make clean",
                         action="store_true")
     args = parser.parse_args()
 
