@@ -5,6 +5,10 @@ tags:
   - 压缩
 ---
 
+# 简介
+
+---
+
 # 正文
 
 ## 示例
@@ -32,3 +36,7 @@ tar -xzvf archive.tar.gz # 解压并解出 archive.tar.gz
 -j, --bzip2 # 通过 bzip2 过滤归档
 -J, --xz # 通过 xz 过滤归档
 ```
+
+---
+
+# 引用

@@ -6,6 +6,10 @@ tags:
   - 编程语言
 ---
 
+# 简介
+
+---
+
 # 正文
 
 C 语言中，使用 `NULL` 表示空指针，定义如下：
@@ -57,3 +61,7 @@ foo(nullptr);
 ```cpp
 foo(static_cast<char *>(nullptr));
 ```
+
+---
+
+# 引用

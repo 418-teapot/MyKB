@@ -29,7 +29,9 @@ dot -Tv -Kv -O example.dot
 
 其中 `-Tv` 中的 `v` 表示 Graphviz 支持的输出格式，包括 bmp、png、gif、ico、jpg、jpeg、svg、pdf、ps 等；`-Kv` 中的 `v` 表示布局器，当使用 dot 布局时可以省略该参数；`-O` 表示自动根据输入文件名来给输出文件命名。
 
-# DOT 语法
+---
+
+# 正文
 
 ## 基础
 
@@ -336,3 +338,9 @@ digraph {
     struct1:next -> struct2:prev;
 }
 ```
+
+---
+
+# 引用
+
+- [DOT Language](https://www.graphviz.org/doc/info/lang.html)
