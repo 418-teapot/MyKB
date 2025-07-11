@@ -9,10 +9,7 @@ tags:
 
 f-string，也被称为格式化字符串常量（formatted string literals），是一种简便的字符串格式化方法。f-string 在形式上是以 `f` 或者 `F` 修饰符引领的字符串（`f'xxx'` 或 `F'xxx'`），以大括号 `{}` 标明被替换的字段。
 
-> [!info]
-> While other string literals always have a constant value, formatted strings are really expressions evaluated at run time.
-> 
-> 与具有定值的其他字符串字面量不同，格式化字符串实际上是运行时求值的表达式。
+> 与始终是常量的字符串字面量不同，格式化字符串实际上是运行时求值的表达式。
 
 ---
 
