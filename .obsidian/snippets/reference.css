@@ -48,7 +48,14 @@
     background-color: #1d1f21;
 }
 .ayu .grammar-literal {
-    background-color: #191f26
+    background-color: #191f26;
+}
+
+.theme-light .grammar-literal {
+    background-color: #fafafa;
+}
+.theme-dark .grammar-literal {
+    background-color: #121212;
 }
 
 .grammar-production:target, .railroad-production:target {
@@ -101,7 +108,7 @@
     --railroad-rect-fill: hsl(-290, 70%, 90%);
 }
 
-.coal, .navy, .ayu {
+.coal, .navy, .ayu, .theme-dark {
     --railroad-background-color: hsl(230, 10%, 20%);
     --railroad-background-image: linear-gradient(to right, rgba(150, 150, 150, .05) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(150, 150, 150, .05) 1px, transparent 1px);
