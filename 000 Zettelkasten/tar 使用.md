@@ -30,7 +30,6 @@ tar -xzvf archive.tar.gz # 解压并解出 archive.tar.gz
 -x, --extract, --get # 从归档中解出文件
 -C, --directory=DIR # 解出文件至指定的目录
 -f, --file # 要操作的文件名
--x, --extract # 解压文件
 -z, --gzip, --gunzip, --ungzip # 通过 gzip 过滤归档
 -v, --verbose # 详细显示处理过程
 -j, --bzip2 # 通过 bzip2 过滤归档
