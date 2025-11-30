@@ -1,0 +1,19 @@
+views:
+  - type: cards
+    name: 简单
+    filters:
+      and:
+        - file.inFolder("003 技术学习/LeetCode")
+        - difficulty == "简单"
+    order:
+      - file.name
+      - tags
+  - type: cards
+    name: 中等
+    filters:
+      and:
+        - file.inFolder("003 技术学习/LeetCode")
+        - difficulty == "中等"
+    order:
+      - file.name
+      - tags
