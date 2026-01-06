@@ -5,6 +5,7 @@
   "nativeMenus": false,
   "translucency": false,
   "enabledCssSnippets": [
+    "heti",
     "side_note",
     "table"
   ],
