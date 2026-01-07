@@ -1,0 +1,80 @@
+.callout[data-callout="poetry"] {
+  --callout-color: transparent;
+  --callout-icon: none;
+}
+
+.callout[data-callout="poetry"] .callout-title {
+  /* 居中对齐 */
+  margin-left: auto;
+  margin-right: auto;
+  max-width: fit-content;
+
+  /* 文字样式 */
+  font-size: 30px;
+  font-weight: 800;
+  text-align: center;
+  text-indent: 0
+}
+
+.callout[data-callout="poetry"] p {
+  /* 相对定位，只使正文参与宽度计算 */
+  position: relative;
+
+  /* 居中对齐 */
+  margin-left: auto;
+  margin-right: auto;
+  max-width: fit-content;
+
+  /* 标点挤压 */
+  /* 给整行文字设置一个负的字间距，数值等于一个标点的宽度（约 1em） */
+  /* 这会强行把整行文字的“计算宽度”压缩掉一个字符 */
+  letter-spacing: -1em;
+  /* 增加等额的 padding-left，把文字挤回去，确保左侧对齐 */
+  padding-left: 1em;
+
+  /* 文字样式 */
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 30px;
+  text-align: left;
+}
+
+.callout[data-callout="poetry"] p::first-line {
+  letter-spacing: 0.05em; /* 恢复文字内部的正常显示，防止字叠字 */
+}
+
+.callout[data-callout="poetry"] .footnote-ref {
+  /* 绝对定位，禁止脚注参与宽度计算 */
+  position: absolute;
+
+  display: inline-block; /* 行内块显示，防止脚注堆叠 */
+  vertical-align: super; /* 保持上标位置 */
+  letter-spacing: 0.05em; /* 恢复文字内部的正常显示，防止字叠字 */
+  white-space: nowrap; /* 防止折行 */
+  
+  transform: translateX(0em); /* 基础偏移量 */
+  
+  /* 文字样式 */
+  font-size: x-small;
+  line-height: 1;
+}
+
+/* 手动控制每个脚标的编译量 */
+.callout[data-callout="poetry"] .footnote-ref:nth-of-type(2) {
+  transform: translateX(2em)
+}
+.callout[data-callout="poetry"] .footnote-ref:nth-of-type(3) {
+  transform: translateX(4em)
+}
+.callout[data-callout="poetry"] .footnote-ref:nth-of-type(4) {
+  transform: translateX(6em)
+}
+
+.callout[data-callout="poetry"] .footnote-ref a {
+  text-decoration: none;
+  color: var(--text-faint);
+  background: var(--background-secondary);
+  padding: 0 1px;
+  border-radius: 3px;
+  border: 1px solid var(--background-modifier-border);
+}
