@@ -5,9 +5,10 @@
   "nativeMenus": false,
   "translucency": false,
   "enabledCssSnippets": [
+    "callout",
     "heti",
     "side_note",
-    "table"
+    "table",
   ],
   "theme": "obsidian",
   "interfaceFontFamily": "Noto Sans CJK SC"
