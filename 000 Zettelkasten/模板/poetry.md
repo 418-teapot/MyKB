@@ -1,11 +1,11 @@
 ---
-style: text
+style: poetry
 author:
 tags:
   - {{dummy}}
 ---
 
-# 正文
+> [!poetry] {{title}}
 
 ---
 
