@@ -1,6 +1,6 @@
 ---
 date: {{date:YYYY-MM-DD}}
-style: idea
+type: idea
 tags:
   - {{dummy}}
 ---

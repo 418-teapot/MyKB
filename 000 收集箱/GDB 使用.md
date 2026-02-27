@@ -1,5 +1,5 @@
 ---
-style: manual
+type: manual
 tags:
   - 工具
   - 调试

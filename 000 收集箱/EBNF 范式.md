@@ -1,5 +1,5 @@
 ---
-style: manual
+type: manual
 tags:
   - EBNF
   - 编程语言

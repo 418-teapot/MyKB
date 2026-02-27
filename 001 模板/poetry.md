@@ -1,5 +1,5 @@
 ---
-style: poetry
+type: poetry
 author:
 tags:
   - {{dummy}}

@@ -1,5 +1,5 @@
 ---
-style: text
+type: text
 author:
 tags:
   - {{dummy}}
