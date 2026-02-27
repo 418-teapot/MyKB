@@ -1,0 +1,21 @@
+views:
+  - type: cards
+    name: 工具
+    filters:
+      and:
+        - file.inFolder("302 代码片段")
+        - kind == "util"
+    order:
+      - file.name
+      - lang
+      - tags
+  - type: cards
+    name: C++
+    filters:
+      and:
+        - file.inFolder("302 代码片段")
+        - lang == "cpp"
+    order:
+      - file.name
+      - kind
+      - tags
