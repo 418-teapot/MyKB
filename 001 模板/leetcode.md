@@ -1,4 +1,5 @@
 ---
+type: leetcode
 difficulty: {{dummy}}
 tags:
   - {{dummy}}

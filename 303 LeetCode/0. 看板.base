@@ -3,7 +3,7 @@ views:
     name: 简单
     filters:
       and:
-        - file.inFolder("003 技术学习/LeetCode")
+        - file.inFolder("303 LeetCode")
         - difficulty == "简单"
     order:
       - file.name
@@ -12,7 +12,7 @@ views:
     name: 中等
     filters:
       and:
-        - file.inFolder("003 技术学习/LeetCode")
+        - file.inFolder("303 LeetCode")
         - difficulty == "中等"
     order:
       - file.name
