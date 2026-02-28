@@ -1,0 +1,4 @@
+.theme-dark img[src$=".svg"],
+.theme-dark .image-embed[src$=".svg"] img {
+  filter: invert(1) hue-rotate(180deg);
+}
