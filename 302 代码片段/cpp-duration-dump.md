@@ -27,7 +27,7 @@ public:
         std::chrono::duration_cast<std::chrono::milliseconds>(now - point);
     llvm::errs() << message << " duration: " << duration.count() << " ms\n";
   }
-  
+
 private:
   std::chrono::time_point<std::chrono::high_resolution_clock> point;
 };
