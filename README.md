@@ -6,8 +6,9 @@ MyKB 是一些知识和随笔的记录，使用 Obsidian 编写及阅读。
 
 在开始之前，请确保已经安装了这些依赖：
 
-* python
 * make
+* poppler
+* python
 * texlive
 
 然后可以执行下面的命令来构建出该项目：
