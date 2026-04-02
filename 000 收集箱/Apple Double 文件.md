@@ -1,0 +1,44 @@
+---
+type: manual
+tags:
+  - 操作系统
+  - 文件系统
+  - Darwin
+---
+
+# 简介
+
+Apple Double 文件是 macOS 在不支持扩展属性（xattr）的文件系统上，为保存文件元数据而生成的兼容性格式。包括：
+
+- `._filename`：原文件的资源分支、Finder 标签、自定义图标等；
+- `__MACOSX/`：压缩包中集中存放 `._*` 文件的目录。
+
+---
+
+# 正文
+
+## 双分支文件系统
+
+1984 年 macOS 引入的 HFS 文件系统采用双分支结构，与 FAT32、NTFS、ext4 等单分支系统不同，双分支文件系统将文件分为 Data Fork（实际内容）和 Resource Fork（元数据：图标、窗口位置、类型/创建者代码等）。Resource Fork 对 macOs 用户透明，但非 macOs 只能看到 Data Fork，导致跨平台时数据丢失。
+
+现代 APFS 文件系统已转向单分支配合 xattr，双分支等特性仅通过兼容性 API 层模拟保留。
+
+## 优缺点
+
+**优势**：元数据与文件强绑定，复制时自动同步，早期 Mac 借此实现无扩展名文件、自定义图标和桌面数据库。
+
+**劣势**：跨平台兼容性差，网络传输需专用协议，结构固定难以扩展，终被 xattr 机制取代。
+
+## 设计矛盾
+
+双分支是 macOS 早期”文件即对象”理念的产物，强调文件的自描述性。现代 APFS 文件系统为 Unix 兼容性和网络互操作性转向单分支配合 xattr，但保留了“元数据不可丢”的设计哲学。
+
+当遇到不支持 xattr 的文件系统（FAT32、exFAT、SMB 等）时，APFS 必须将元数据剥离出来单独存放——这就是 Apple Double 文件。用户看到的 " 污染 "（`._` 文件散落、`__MACOSX` 目录）正是这一妥协的结果。
+
+若像普通 Unix 那样彻底放弃元数据保留，就不会有 Apple Double。但苹果选择兼容历史，于是产生了这个跨平台的 " 副作用 "。
+
+---
+
+# 引用
+
+- [APFS: Extended attributes revisited](https://eclecticlight.co/2024/05/13/apfs-extended-attributes-revisited/)
