@@ -4,7 +4,8 @@
     "heti",
     "side_note",
     "svg",
-    "table"
+    "table",
+    "footnotes"
   ],
   "monospaceFontFamily": "FiraCode Nerd Font"
 }
