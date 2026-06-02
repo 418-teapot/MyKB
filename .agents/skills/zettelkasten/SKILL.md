@@ -18,7 +18,7 @@ description: Use when the user asks to organize a source text into permanent not
 
 1. **必须用自己的话消化**。"收集信息不会增加知识"（Zettelkasten.de）。
 2. **永久笔记应 atomic**：一个概念一篇笔记（Andy Matuschak）。
-3. **原文不必全文张贴**：只摘录关键段落，添加批注。
+3. **文献笔记必须张贴原文全文**，不得省略段落。批注引用原文时用 `==重点内容==` 高亮被引用的部分。
 
 ## 模板
 
@@ -34,7 +34,7 @@ tags:
 ---
 ```
 
-结构：批注在前（`> [!note | aside-r]`），原文摘录在后，末尾 `# 引用` 用 `- [标题](url)` 格式列出原始出处。
+结构：批注在前（`> [!note | aside-r]`），原文全文在后（用 `> ` 块引用，不得省略段落），批注引用的原文部分用 `==重点内容==` 高亮。末尾 `# 引用` 用 `- [标题](url)` 格式列出原始出处。
 
 创建命令：`obsidian create path="目录/笔记名.md" template="literature"`
 
