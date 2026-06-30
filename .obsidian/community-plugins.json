@@ -1,7 +1,7 @@
 [
   "obsidian-linter",
-  "codeblock-customizer",
   "obsidian-style-settings",
   "table-editor-obsidian",
-  "dataview"
+  "dataview",
+  "shiki-highlighter"
 ]
