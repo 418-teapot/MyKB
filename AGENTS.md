@@ -51,6 +51,7 @@ python make.py --clean   # 清理编译产物
 | `manual` | `tags` | 操作指南/How-to |
 | `idea` | `date`, `tags` | 概念笔记 |
 | `text` | `author`, `tags` | 一般文本笔记 |
+| `reading` | `book`, `author`, `chapter`, `aliases`, `tags` | 书籍章节笔记 |
 | `poetry` | `author`, `tags` | 古典诗词（内容放在 `> [!poetry]` callout 中） |
 | `snippet` | `lang`, `kind`（algorithm/util/config）, `tags` | 代码片段 |
 | `leetcode` | `difficulty`, `tags` | LeetCode 题解 |

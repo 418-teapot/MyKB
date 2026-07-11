@@ -15,7 +15,7 @@
 \begin{tikzpicture}
     \node [draw, rectangle split, rectangle split parts = 3, align = center,
            rectangle split horizontal = true, text width = 8em] (A)
-           {处理器\nodepart{two}主存\nodepart{three}I/O 设备};
+           {处理器\nodepart{two}内存\nodepart{three}I/O 设备};
 
     \def\abstractions{
         (A.two split north)/文件,
