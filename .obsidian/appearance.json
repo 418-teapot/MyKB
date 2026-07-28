@@ -1,11 +1,12 @@
 {
   "enabledCssSnippets": [
     "callout",
+    "footnotes",
     "heti",
+    "media-card",
     "side_note",
     "svg",
-    "table",
-    "footnotes"
+    "table"
   ],
   "monospaceFontFamily": "FiraCode Nerd Font"
 }

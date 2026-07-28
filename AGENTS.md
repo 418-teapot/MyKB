@@ -29,6 +29,7 @@ python make.py --clean   # 清理编译产物
 |------|------|
 | `000 收集箱/` | 快速捕获暂存 |
 | `001 模板/` | 笔记模板 |
+| `002 媒体库/` | 媒体消费记录（书籍/电影/专辑，按创作者分层） |
 | `100 文学概念/` | 文学领域的概念词条 |
 | `101 中国古典文学/` | 诗词（按 `朝代/作者/标题.md` 组织） |
 | `200 社会概念/` | 社会、政治领域的概念词条 |
@@ -61,6 +62,7 @@ python make.py --clean   # 清理编译产物
 | `snippet` | `lang`, `kind`（algorithm/util/config）, `tags` | 代码片段 |
 | `leetcode` | `difficulty`, `tags` | LeetCode 题解 |
 | `lang` | `lang`, `tags` | 编程语言章节笔记（配合 `301 编程语言/结构模版.md`） |
+| `media` | `kind`, `title`, `creator`, `genre`, `year`, `date`, `rating`, `tags` | 媒体消费记录（书/电影/专辑，rating 为 3 分制） |
 
 模板文件位于 `001 模板/`，新笔记应从对应模板创建。
 

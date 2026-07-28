@@ -1,0 +1,147 @@
+/* ============================================================
+   Media Card — 流媒体风格媒体卡片（Obsidian callout 方案）
+   配合 001 模板/media.md 使用：
+   - [!media]  卡片：封面 + 标题 + 艺术家 + 元数据 + 星级
+   - [!tracks] 曲目列表：播放列表样式
+   ============================================================ */
+
+/* ── 可调参数 ── */
+.callout[data-callout="media"] {
+  --media-cover-size: 140px;    /* 封面边长（正方形） */
+  --media-artist-color: #fa2d48; /* 艺术家色（Apple Music 粉红） */
+  --media-rating-color: #f7b500; /* 星级色（金） */
+}
+
+/* ── 两个 callout 的公共重置 ── */
+.callout[data-callout="media"],
+.callout[data-callout="tracks"] {
+  --callout-color: transparent;
+  --callout-icon: none;
+
+  border-radius: 12px;
+  background: var(--background-secondary);
+}
+
+.callout[data-callout="media"] .callout-icon,
+.callout[data-callout="tracks"] .callout-icon {
+  display: none;
+}
+
+/* ============================================================
+   [!media] 卡片（Apple Music 专辑页风格）
+   布局：封面居左占满行高；右列自上而下 = 标题 → 艺术家 → 元数据 → 星级。
+   用 display: contents 摊平 callout 内部 DOM，使标题与正文段落进入同一 grid。
+   ============================================================ */
+.callout[data-callout="media"] {
+  display: grid;
+  grid-template-columns: var(--media-cover-size) 1fr;
+  column-gap: 20px;
+  align-items: center;
+
+  padding: 16px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.callout[data-callout="media"] .callout-content {
+  display: contents;
+}
+
+/* 右列四行的共享属性 */
+.callout[data-callout="media"] .callout-title,
+.callout[data-callout="media"] .callout-content p {
+  grid-column: 2;
+  margin: 2px 0;
+  padding: 0;
+}
+
+/* 标题（右列第 1 行） */
+.callout[data-callout="media"] .callout-title {
+  grid-row: 1;
+  font-size: 1.4em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* 封面（左列，纵向占满 4 行） */
+.callout[data-callout="media"] .callout-content p:first-of-type {
+  grid-column: 1;
+  grid-row: 1 / span 4;
+  margin: 0;
+}
+
+.callout[data-callout="media"] .callout-content p:first-of-type img {
+  width: var(--media-cover-size);
+  height: var(--media-cover-size);
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* 艺术家（右列第 2 行） */
+.callout[data-callout="media"] .callout-content p:nth-of-type(2) {
+  grid-row: 2;
+  color: var(--media-artist-color);
+  font-size: 1.05em;
+}
+
+/* 元数据（右列第 3 行：类型 · 年份） */
+.callout[data-callout="media"] .callout-content p:nth-of-type(3) {
+  grid-row: 3;
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+/* 星级（右列第 4 行） */
+.callout[data-callout="media"] .callout-content p:nth-of-type(4) {
+  grid-row: 4;
+  color: var(--media-rating-color);
+  font-size: 1.05em;
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================
+   [!tracks] 曲目列表（播放列表样式）
+   ============================================================ */
+.callout[data-callout="tracks"] ol {
+  margin: 0;
+  padding-left: 2em;
+}
+
+.callout[data-callout="tracks"] li {
+  padding: 6px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-muted) 20%, transparent);
+}
+
+.callout[data-callout="tracks"] li:last-child {
+  border-bottom: none;
+}
+
+.callout[data-callout="tracks"] li:hover {
+  background: color-mix(in srgb, var(--text-muted) 8%, transparent);
+  border-radius: 4px;
+}
+
+.callout[data-callout="tracks"] ol {
+  counter-reset: track;
+}
+
+.callout[data-callout="tracks"] li {
+  counter-increment: track;
+}
+
+.callout[data-callout="tracks"] li strong {
+  color: var(--text-accent);
+}
+
+.callout[data-callout="tracks"] li:has(strong) {
+  list-style: none;
+  position: relative;
+}
+
+.callout[data-callout="tracks"] li:has(strong)::before {
+  content: "★ " counter(track) ".";
+  position: absolute;
+  right: calc(100% + 0.4em);
+  white-space: nowrap;
+  color: var(--text-muted);
+}
