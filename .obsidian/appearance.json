@@ -8,5 +8,6 @@
     "svg",
     "table"
   ],
-  "monospaceFontFamily": "FiraCode Nerd Font"
+  "monospaceFontFamily": "FiraCode Nerd Font",
+  "showRibbon": true
 }
